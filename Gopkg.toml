@@ -7,16 +7,19 @@ required = [
 
 [[constraint]]
   name = "k8s.io/client-go"
-  branch = "release-9.0"
+  branch = "release-10.0"
 
 [[constraint]]
   name = "k8s.io/code-generator"
-  branch = "release-1.12"
+  branch = "release-1.13"
 
 [[constraint]]
-  branch = "release-1.12"
+  branch = "release-1.13"
   name = "k8s.io/api"
 
+[[constraint]]
+  branch = "release-1.13"
+  name = "k8s.io/kubernetes"
 
 # To use reference package:
 #   vendor/k8s.io/kubernetes/pkg/util/parsers/parsers.go:36:16: undefined: reference.ParseNormalizedNamed
@@ -26,4 +29,4 @@ required = [
 
 [[override]]
   name = "k8s.io/apiserver"
-  branch = "release-1.12"
+  branch = "release-1.13"

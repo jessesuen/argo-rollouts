@@ -24,6 +24,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/kubernetes/pkg/controller"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
@@ -461,7 +462,7 @@ func (f *fixture) expectPatchServiceAction(s *corev1.Service, newLabel string) i
 		Version:  "v1",
 	}
 	len := len(f.kubeactions)
-	f.kubeactions = append(f.kubeactions, core.NewPatchAction(serviceSchema, s.Namespace, s.Name, []byte(patch)))
+	f.kubeactions = append(f.kubeactions, core.NewPatchAction(serviceSchema, s.Namespace, s.Name, types.MergePatchType, []byte(patch)))
 	return len
 }
 
@@ -492,22 +493,24 @@ func (f *fixture) expectUpdateRolloutAction(rollout *v1alpha1.Rollout) int {
 
 func (f *fixture) expectPatchRolloutAction(rollout *v1alpha1.Rollout) int {
 	serviceSchema := schema.GroupVersionResource{
+		Group:	  "argoproj.io",
 		Resource: "rollouts",
 		Version:  "v1alpha1",
 	}
 	len := len(f.actions)
-	f.actions = append(f.actions, core.NewPatchAction(serviceSchema, rollout.Namespace, rollout.Name, nil))
+	f.actions = append(f.actions, core.NewPatchAction(serviceSchema, rollout.Namespace, rollout.Name, types.MergePatchType, nil))
 	return len
 }
 
 func (f *fixture) expectPatchRolloutActionWithPatch(rollout *v1alpha1.Rollout, patch string) int {
 	expectedPatch := calculatePatch(rollout, patch)
 	serviceSchema := schema.GroupVersionResource{
+		Group:    "argoproj.io",
 		Resource: "rollouts",
 		Version:  "v1alpha1",
 	}
 	len := len(f.actions)
-	f.actions = append(f.actions, core.NewPatchAction(serviceSchema, rollout.Namespace, rollout.Name, []byte(expectedPatch)))
+	f.actions = append(f.actions, core.NewPatchAction(serviceSchema, rollout.Namespace, rollout.Name, types.MergePatchType, []byte(expectedPatch)))
 	return len
 }
 

@@ -76,7 +76,7 @@ func TestBlueGreenCreatesReplicaSet(t *testing.T) {
 	activeSvc := newService("active", 80, nil)
 	f.kubeobjects = append(f.kubeobjects, previewSvc, activeSvc)
 
-	rs := newReplicaSet(r, "foo-895c6c4f9", 1)
+	rs := newReplicaSet(r, "foo-6b4d66489b", 1)
 	generatedConditions := generateConditionsPatch(false, conditions.NewReplicaSetReason, rs, false)
 
 	f.expectGetServiceAction(activeSvc)
