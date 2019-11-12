@@ -102,10 +102,36 @@ func (o *GetOptions) PrintHeader(w io.Writer) {
 	fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", "NAME", "KIND", "STATUS", "AGE", "INFO")
 }
 
+func (o *GetOptions) InitScreen() {
+	//enter the alternate buffer
+	fmt.Fprint(o.Out, "\x1b[?1049h")
+
+	//hide the cursor
+	//fmt.Fprint(o.Out, "\x1b[?25l")
+
+	o.Clear()
+}
+
 // Clear clears the terminal for updates for live watching of objects
 func (o *GetOptions) Clear() {
-	fmt.Fprint(o.Out, "\033[H\033[2J")
-	fmt.Fprint(o.Out, "\033[0;0H")
+	// home the cursor
+	fmt.Fprint(o.Out, "\033[H")
+
+	// clear the buffer
+	fmt.Fprint(o.Out, "\x1b[2J")
+}
+
+// RestoreScreen restores users buffer during program exit
+// http://xn--rpa.cc/irl/term.html
+func (o *GetOptions) RestoreScreen() {
+	// clean up the alternate buffer
+	fmt.Fprint(o.Out, "\x1b[2J")
+
+	// switch back to the normal buffer
+	fmt.Fprint(o.Out, "\x1b[?1049l")
+
+	// show the cursor again
+	//fmt.Fprint(o.Out, "\x1b[?25h")
 }
 
 // colorize adds ansii color codes to the string based on well known words

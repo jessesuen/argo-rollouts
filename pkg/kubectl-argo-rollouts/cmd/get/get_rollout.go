@@ -1,10 +1,14 @@
 package get
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/juju/ansiterm"
@@ -39,21 +43,31 @@ func NewCmdGetRollout(o *options.ArgoRolloutsOptions) *cobra.Command {
 			ctx := context.Background()
 			controller.Start(ctx)
 
-			ri, err := controller.GetRolloutInfo()
-			if err != nil {
-				return err
-			}
-			if !getOptions.watch {
-				getOptions.PrintRollout(ri)
-			} else {
+			if getOptions.watch {
+				ctx, cancel := context.WithCancel(ctx)
+				defer cancel()
+
+				quit := make(chan os.Signal, 1)
+				signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+				go func() { <-quit; cancel() }()
+
+				getOptions.InitScreen()
+
 				rolloutUpdates := make(chan *info.RolloutInfo)
 				controller.RegisterCallback(func(roInfo *info.RolloutInfo) {
 					rolloutUpdates <- roInfo
 				})
-				go getOptions.WatchRollout(ctx.Done(), rolloutUpdates)
-				controller.Run(ctx)
+				go controller.Run(ctx)
+				getOptions.WatchRollout(ctx.Done(), rolloutUpdates)
 				close(rolloutUpdates)
+				getOptions.RestoreScreen()
 			}
+
+			ri, err := controller.GetRolloutInfo()
+			if err != nil {
+				return err
+			}
+			getOptions.PrintRollout(getOptions.Out, ri)
 			return nil
 		},
 	}
@@ -66,22 +80,25 @@ func NewCmdGetRollout(o *options.ArgoRolloutsOptions) *cobra.Command {
 func (o *GetOptions) WatchRollout(stopCh <-chan struct{}, rolloutUpdates chan *info.RolloutInfo) {
 	ticker := time.NewTicker(time.Second)
 	var currRolloutInfo *info.RolloutInfo
-	// preventFlicker is used to rate-limit the updates we print to the terminal when updates occur
-	// so rapidly that it causes the terminal to flicker
-	var preventFlicker time.Time
 
+	resize := make(chan os.Signal, 1)
+	defer close(resize)
+	signal.Notify(resize, syscall.SIGWINCH)
 	for {
 		select {
 		case roInfo := <-rolloutUpdates:
 			currRolloutInfo = roInfo
 		case <-ticker.C:
+		case <-resize:
 		case <-stopCh:
 			return
 		}
-		if currRolloutInfo != nil && time.Now().After(preventFlicker.Add(200*time.Millisecond)) {
+		if currRolloutInfo != nil {
+			var buf bytes.Buffer
+			o.PrintRollout(&buf, currRolloutInfo)
 			o.Clear()
-			o.PrintRollout(currRolloutInfo)
-			preventFlicker = time.Now()
+			fmt.Fprintln(o.Out, buf.String())
+			//fmt.Fprint(o.Out, "\033[H")
 		}
 	}
 }
@@ -99,36 +116,36 @@ func (o *GetOptions) formatImage(image info.ImageInfo) string {
 	return imageStr
 }
 
-func (o *GetOptions) PrintRollout(roInfo *info.RolloutInfo) {
-	fmt.Fprintf(o.Out, tableFormat, "Name:", roInfo.Name)
-	fmt.Fprintf(o.Out, tableFormat, "Namespace:", roInfo.Namespace)
-	fmt.Fprintf(o.Out, tableFormat, "Status:", o.colorize(roInfo.Icon)+" "+roInfo.Status)
-	fmt.Fprintf(o.Out, tableFormat, "Strategy:", roInfo.Strategy)
+func (o *GetOptions) PrintRollout(out io.Writer, roInfo *info.RolloutInfo) {
+	fmt.Fprintf(out, tableFormat, "Name:", roInfo.Name)
+	fmt.Fprintf(out, tableFormat, "Namespace:", roInfo.Namespace)
+	fmt.Fprintf(out, tableFormat, "Status:", o.colorize(roInfo.Icon)+" "+roInfo.Status)
+	fmt.Fprintf(out, tableFormat, "Strategy:", roInfo.Strategy)
 	if roInfo.Strategy == "Canary" {
-		fmt.Fprintf(o.Out, tableFormat, "  Step:", roInfo.Step)
-		fmt.Fprintf(o.Out, tableFormat, "  SetWeight:", roInfo.SetWeight)
-		fmt.Fprintf(o.Out, tableFormat, "  ActualWeight:", roInfo.ActualWeight)
+		fmt.Fprintf(out, tableFormat, "  Step:", roInfo.Step)
+		fmt.Fprintf(out, tableFormat, "  SetWeight:", roInfo.SetWeight)
+		fmt.Fprintf(out, tableFormat, "  ActualWeight:", roInfo.ActualWeight)
 	}
 	images := roInfo.Images()
 	if len(images) > 0 {
-		fmt.Fprintf(o.Out, tableFormat, "Images:", o.formatImage(images[0]))
+		fmt.Fprintf(out, tableFormat, "Images:", o.formatImage(images[0]))
 		for i := 1; i < len(images); i++ {
-			fmt.Fprintf(o.Out, tableFormat, "", o.formatImage(images[i]))
+			fmt.Fprintf(out, tableFormat, "", o.formatImage(images[i]))
 		}
 	}
-	fmt.Fprint(o.Out, "Replicas:\n")
-	fmt.Fprintf(o.Out, tableFormat, "  Desired:", roInfo.Desired)
-	fmt.Fprintf(o.Out, tableFormat, "  Current:", roInfo.Current)
-	fmt.Fprintf(o.Out, tableFormat, "  Updated:", roInfo.Updated)
-	fmt.Fprintf(o.Out, tableFormat, "  Ready:", roInfo.Ready)
-	fmt.Fprintf(o.Out, tableFormat, "  Available:", roInfo.Available)
+	fmt.Fprint(out, "Replicas:\n")
+	fmt.Fprintf(out, tableFormat, "  Desired:", roInfo.Desired)
+	fmt.Fprintf(out, tableFormat, "  Current:", roInfo.Current)
+	fmt.Fprintf(out, tableFormat, "  Updated:", roInfo.Updated)
+	fmt.Fprintf(out, tableFormat, "  Ready:", roInfo.Ready)
+	fmt.Fprintf(out, tableFormat, "  Available:", roInfo.Available)
 
-	fmt.Fprintf(o.Out, "\n")
-	o.PrintRolloutTree(roInfo)
+	fmt.Fprintf(out, "\n")
+	o.PrintRolloutTree(out, roInfo)
 }
 
-func (o *GetOptions) PrintRolloutTree(roInfo *info.RolloutInfo) {
-	w := ansiterm.NewTabWriter(o.Out, 0, 0, 2, ' ', 0)
+func (o *GetOptions) PrintRolloutTree(out io.Writer, roInfo *info.RolloutInfo) {
+	w := ansiterm.NewTabWriter(out, 0, 0, 2, ' ', 0)
 	o.PrintHeader(w)
 	fmt.Fprintf(w, "%s %s\t%s\t%s %s\t%s\t%v\n", IconRollout, roInfo.Name, "Rollout", o.colorize(roInfo.Icon), roInfo.Status, roInfo.Age(), "")
 	revisions := roInfo.Revisions()
