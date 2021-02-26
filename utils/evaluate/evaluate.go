@@ -5,16 +5,27 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"regexp"
 	"strconv"
 
 	"github.com/antonmedv/expr"
+	"github.com/antonmedv/expr/checker"
+	"github.com/antonmedv/expr/compiler"
+	"github.com/antonmedv/expr/conf"
 	"github.com/antonmedv/expr/file"
+	"github.com/antonmedv/expr/parser"
 	"github.com/sirupsen/logrus"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 )
 
-func EvaluateResult(result interface{}, metric v1alpha1.Metric, logCtx logrus.Entry) v1alpha1.AnalysisPhase {
+var (
+	// A regexp to detect when nil is being compared to non-nil
+	mismatchedTypesWithNil = regexp.MustCompile("mismatched types.*<nil>")
+)
+
+// EvaluateResult returns the AnalysisPhase when evaluating the measurement result
+func EvaluateResult(result interface{}, metric v1alpha1.Metric, logCtx logrus.Entry) (v1alpha1.AnalysisPhase, error) {
 	successCondition := false
 	failCondition := false
 	var err error
@@ -22,22 +33,20 @@ func EvaluateResult(result interface{}, metric v1alpha1.Metric, logCtx logrus.En
 	if metric.SuccessCondition != "" {
 		successCondition, err = EvalCondition(result, metric.SuccessCondition)
 		if err != nil {
-			logCtx.Warning(err.Error())
-			return v1alpha1.AnalysisPhaseError
+			return v1alpha1.AnalysisPhaseError, err
 		}
 	}
 	if metric.FailureCondition != "" {
 		failCondition, err = EvalCondition(result, metric.FailureCondition)
 		if err != nil {
-			logCtx.Warning(err.Error())
-			return v1alpha1.AnalysisPhaseError
+			return v1alpha1.AnalysisPhaseError, err
 		}
 	}
 
 	switch {
 	case metric.SuccessCondition == "" && metric.FailureCondition == "":
-		//Always return success unless there is an error
-		return v1alpha1.AnalysisPhaseSuccessful
+		// Always return success unless there is an error
+		return v1alpha1.AnalysisPhaseSuccessful, nil
 	case metric.SuccessCondition != "" && metric.FailureCondition == "":
 		// Without a failure condition, a measurement is considered a failure if the measurement's success condition is not true
 		failCondition = !successCondition
@@ -47,21 +56,20 @@ func EvaluateResult(result interface{}, metric v1alpha1.Metric, logCtx logrus.En
 	}
 
 	if failCondition {
-		return v1alpha1.AnalysisPhaseFailed
+		return v1alpha1.AnalysisPhaseFailed, nil
 	}
 
 	if !failCondition && !successCondition {
-		return v1alpha1.AnalysisPhaseInconclusive
+		return v1alpha1.AnalysisPhaseInconclusive, nil
 	}
 
 	// If we reach this code path, failCondition is false and successCondition is true
-	return v1alpha1.AnalysisPhaseSuccessful
+	return v1alpha1.AnalysisPhaseSuccessful, nil
 }
 
-// EvalCondition evaluates the condition with the resultValue as an input
+// EvalCondition evaluates the condition with the resultValue as an input. This function supports
+// lazy evaluation (e.g. result != nil && result > 0)
 func EvalCondition(resultValue interface{}, condition string) (bool, error) {
-	var err error
-
 	env := map[string]interface{}{
 		"result":  resultValue,
 		"asInt":   asInt,
@@ -69,30 +77,62 @@ func EvalCondition(resultValue interface{}, condition string) (bool, error) {
 		"isNaN":   math.IsNaN,
 		"isInf":   isInf,
 	}
-
-	unwrapFileErr := func(e error) error {
-		if fileErr, ok := err.(*file.Error); ok {
-			e = errors.New(fileErr.Message)
-		}
-		return e
+	// first try with strict mode, if it passes, then great
+	output, err := eval(resultValue, condition, env, true)
+	if err == nil {
+		return output, nil
 	}
+	// if the error is anything but mismatched type check against nil, return the error
+	if !mismatchedTypesWithNil.MatchString(err.Error()) {
+		return false, err
+	}
+	// otherwise re-run evaluation but disabling strict mode
+	return eval(resultValue, condition, env, false)
+}
 
-	program, err := expr.Compile(condition, expr.Env(env))
+// unwrapFileErr is a helper to remove multi-line formatting from expr errors
+func unwrapFileErr(e error) error {
+	if fileErr, ok := e.(*file.Error); ok {
+		e = errors.New(fileErr.Message)
+	}
+	return e
+}
+
+// eval is a wrapper on expr Compile and Run, but with an option to disable strict mode.
+// Disabling strict allows us to relax checks against strict type checking, unknown variables,
+// in order for us to do things like lazy evaluation.
+func eval(resultValue interface{}, condition string, env map[string]interface{}, strict bool) (bool, error) {
+	//expr.Compile()
+	config := conf.New(env)
+	config.Strict = strict
+	config.Optimize = true
+	err := config.Check()
 	if err != nil {
 		return false, unwrapFileErr(err)
 	}
-
+	tree, err := parser.Parse(condition)
+	if err != nil {
+		return false, unwrapFileErr(err)
+	}
+	if strict {
+		_, err = checker.Check(tree, config)
+		if err != nil {
+			return false, unwrapFileErr(err)
+		}
+	}
+	program, err := compiler.Compile(tree, config)
+	if err != nil {
+		return false, unwrapFileErr(err)
+	}
 	output, err := expr.Run(program, env)
 	if err != nil {
 		return false, unwrapFileErr(err)
 	}
-
-	switch val := output.(type) {
-	case bool:
-		return val, nil
-	default:
-		return false, fmt.Errorf("expected bool, but got %T", val)
+	val, ok := output.(bool)
+	if !ok {
+		return false, fmt.Errorf("expected bool, but got %T", output)
 	}
+	return val, nil
 }
 
 func isInf(f float64) bool {

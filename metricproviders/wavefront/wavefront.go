@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math"
+	"os"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	wavefrontapi "github.com/spaceapegames/go-wavefront"
@@ -23,7 +26,34 @@ const (
 	ProviderType = "Wavefront"
 	//k8s secret that has wavefront api tokens
 	WavefrontTokensSecretName = "wavefront-api-tokens"
+
+	// EnvVarWavefrontLookback is a duration string that defines the lookback period when performing
+	// wavefront queries. If unspecified, will use the interval. If interval is not specified,
+	// will use 5m.
+	EnvVarWavefrontLookback = "ARGO_ROLLOUTS_WAVEFRONT_LOOKBACK"
 )
+
+var (
+	defaultLookback = 5 * time.Minute
+)
+
+func intervalOrDefaultLookback(interval v1alpha1.DurationString) time.Duration {
+	if interval != "" {
+		d, err := interval.Duration()
+		if err == nil {
+			return d
+		}
+		log.Warnf("unable to parse interval: %s", interval)
+	}
+	if lookback := os.Getenv(EnvVarWavefrontLookback); lookback != "" {
+		d, err := time.ParseDuration(lookback)
+		if err == nil {
+			return d
+		}
+		log.Warnf("unable to parse wavefront lookback: %v", lookback)
+	}
+	return defaultLookback
+}
 
 type Provider struct {
 	api    WavefrontClientAPI
@@ -62,6 +92,7 @@ type wavefrontResponse struct {
 	newValue   string
 	newStatus  v1alpha1.AnalysisPhase
 	epochsUsed string
+	message    string
 }
 
 // Run queries with wavefront provider for the metric
@@ -72,6 +103,7 @@ func (p *Provider) Run(run *v1alpha1.AnalysisRun, metric v1alpha1.Metric) v1alph
 		Metadata:  map[string]string{},
 	}
 
+	//lookback := intervalOrDefaultLookback(metric.Interval)
 	queryParams := &wavefrontapi.QueryParams{
 		QueryString:             metric.Provider.Wavefront.Query,
 		StartTime:               strconv.FormatInt(startTime.Unix()*1000, 10),
@@ -80,6 +112,23 @@ func (p *Provider) Run(run *v1alpha1.AnalysisRun, metric v1alpha1.Metric) v1alph
 		Granularity:             "s",
 		SeriesOutsideTimeWindow: false,
 	}
+	// sum(rate(5m, ts(custom.ip.zachboard.qb-company-service.fci-*, env=e2e)))
+	// SeriesOutsideTimeWindow: false
+
+	// SeriesOutsideTimeWindow: true
+	// [[1614331339,0.0]]
+	// [[1614331339,0.0]]
+	// [[1614331339,0.0]]
+
+	// maxPoints unspecified:
+	// [[1614329839,0.07612203389830502],[1614330139,0.062431210556511824]]}]
+	// maxPoints: 1
+	// [[1614330000,0.06243121055651192],[1614330300,0.012734044600925547],[1614330600,0.012734044600925547]]}]
+	// maxPoints unspecified:
+	// [[1614330139,0.06243121055651192],[1614330439,0.012734044600925547],[1614330934,0.012734044600925547]]}]
+	// maxpoints unspecified, start/endtime at query time
+	// [[1614330439,0.012734044600925547],[1614330999,0.012734044600925547]]}]
+	// [[1614330439,0.012734044600925547],[1614330739,0.0],[1614331088,0.0]]}]
 
 	response, err := p.api.NewQuery(queryParams).Execute()
 	if response != nil && response.Warnings != "" {
@@ -91,8 +140,8 @@ func (p *Provider) Run(run *v1alpha1.AnalysisRun, metric v1alpha1.Metric) v1alph
 	result, err := p.processResponse(metric, response, startTime)
 	if err != nil {
 		return metricutil.MarkMeasurementError(newMeasurement, err)
-
 	}
+	newMeasurement.Message = result.message
 	newMeasurement.Value = result.newValue
 	newMeasurement.Phase = result.newStatus
 	newMeasurement.Metadata["timestamps"] = result.epochsUsed
@@ -137,12 +186,19 @@ func (p *Provider) findDataPointValue(datapoints []wavefrontapi.DataPoint, start
 
 func (p *Provider) processResponse(metric v1alpha1.Metric, response *wavefrontapi.QueryResponse, startTime metav1.Time) (wavefrontResponse, error) {
 	wavefrontResponse := wavefrontResponse{}
+	resp, _ := ioutil.ReadAll(response.RawResponse)
+	p.logCtx.Infof("%s", string(resp))
+
+	var err error
 	if len(response.TimeSeries) == 1 {
 		series := response.TimeSeries[0]
 		value, time := p.findDataPointValue(series.DataPoints, startTime) // Wavefront DataPoint struct is of type []float{<timestamp>, <value>}
 		wavefrontResponse.newValue = fmt.Sprintf("%.2f", value)
 		wavefrontResponse.epochsUsed = time
-		wavefrontResponse.newStatus = evaluate.EvaluateResult(value, metric, p.logCtx)
+		wavefrontResponse.newStatus, err = evaluate.EvaluateResult(value, metric, p.logCtx)
+		if err != nil {
+			wavefrontResponse.message = err.Error()
+		}
 		return wavefrontResponse, nil
 
 	} else if len(response.TimeSeries) > 1 {
@@ -165,10 +221,14 @@ func (p *Provider) processResponse(metric v1alpha1.Metric, response *wavefrontap
 		epochsStr = epochsStr + "]"
 		wavefrontResponse.newValue = valueStr
 		wavefrontResponse.epochsUsed = epochsStr
-		wavefrontResponse.newStatus = evaluate.EvaluateResult(results, metric, p.logCtx)
+		wavefrontResponse.newStatus, err = evaluate.EvaluateResult(results, metric, p.logCtx)
+		if err != nil {
+			wavefrontResponse.message = err.Error()
+		}
 		return wavefrontResponse, nil
 
 	} else {
+		wavefrontResponse.newValue = "null"
 		wavefrontResponse.newStatus = v1alpha1.AnalysisPhaseFailed
 		return wavefrontResponse, fmt.Errorf("No TimeSeries found in response from Wavefront")
 	}

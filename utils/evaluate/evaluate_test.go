@@ -17,8 +17,9 @@ func TestEvaluateResultWithSuccess(t *testing.T) {
 		FailureCondition: "false",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseSuccessful, status)
+	assert.NoError(t, err)
 }
 
 func TestEvaluateResultWithFailure(t *testing.T) {
@@ -27,9 +28,9 @@ func TestEvaluateResultWithFailure(t *testing.T) {
 		FailureCondition: "true",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseFailed, status)
-
+	assert.NoError(t, err)
 }
 
 func TestEvaluateResultInconclusive(t *testing.T) {
@@ -38,8 +39,9 @@ func TestEvaluateResultInconclusive(t *testing.T) {
 		FailureCondition: "false",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseInconclusive, status)
+	assert.NoError(t, err)
 }
 
 func TestEvaluateResultNoSuccessConditionAndNotFailing(t *testing.T) {
@@ -48,8 +50,9 @@ func TestEvaluateResultNoSuccessConditionAndNotFailing(t *testing.T) {
 		FailureCondition: "false",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseSuccessful, status)
+	assert.NoError(t, err)
 }
 
 func TestEvaluateResultNoFailureConditionAndNotSuccessful(t *testing.T) {
@@ -58,8 +61,9 @@ func TestEvaluateResultNoFailureConditionAndNotSuccessful(t *testing.T) {
 		FailureCondition: "",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseFailed, status)
+	assert.NoError(t, err)
 }
 
 func TestEvaluateResultNoFailureConditionAndNoSuccessCondition(t *testing.T) {
@@ -68,8 +72,9 @@ func TestEvaluateResultNoFailureConditionAndNoSuccessCondition(t *testing.T) {
 		FailureCondition: "",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseSuccessful, status)
+	assert.NoError(t, err)
 }
 
 func TestEvaluateResultWithErrorOnSuccessCondition(t *testing.T) {
@@ -78,8 +83,9 @@ func TestEvaluateResultWithErrorOnSuccessCondition(t *testing.T) {
 		FailureCondition: "true",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseError, status)
+	assert.EqualError(t, err, "unknown name a")
 }
 
 func TestEvaluateResultWithErrorOnFailureCondition(t *testing.T) {
@@ -88,8 +94,9 @@ func TestEvaluateResultWithErrorOnFailureCondition(t *testing.T) {
 		FailureCondition: "a == true",
 	}
 	logCtx := logrus.WithField("test", "test")
-	status := EvaluateResult(true, metric, *logCtx)
+	status, err := EvaluateResult(true, metric, *logCtx)
 	assert.Equal(t, v1alpha1.AnalysisPhaseError, status)
+	assert.EqualError(t, err, "unknown name a")
 }
 
 func TestEvaluateConditionWithSuccess(t *testing.T) {
@@ -116,6 +123,12 @@ func TestErrorWithInvalidReference(t *testing.T) {
 	assert.False(t, b)
 }
 
+func TestErrorWithInvalidReference2(t *testing.T) {
+	b, err := EvalCondition(true, "invalidVariable == true")
+	assert.Equal(t, fmt.Errorf("unknown name invalidVariable"), err)
+	assert.False(t, b)
+}
+
 func TestEvaluateArray(t *testing.T) {
 	floats := []float64{float64(2), float64(2)}
 	b, err := EvalCondition(floats, "all(result, {# > 1})")
@@ -138,14 +151,60 @@ func TestEvaluateFloat64(t *testing.T) {
 
 func TestEvaluateInvalidStruct(t *testing.T) {
 	b, err := EvalCondition(true, "result.Name() == 'hi'")
-	assert.Errorf(t, err, "")
+	assert.EqualError(t, err, "type bool has no method Name")
 	assert.False(t, b)
 }
 
 func TestEvaluateAsIntPanic(t *testing.T) {
 	b, err := EvalCondition("1.1", "asInt(result) == 1.1")
-	assert.Errorf(t, err, "got expected error: %v", err)
+	assert.EqualError(t, err, "strconv.ParseInt: parsing \"1.1\": invalid syntax")
 	assert.False(t, b)
+}
+
+func TestEvaluateNil(t *testing.T) {
+	tests := []struct {
+		input       interface{}
+		expression  string
+		expectation bool
+		expectedErr string
+	}{
+		{nil, "result == nil", true, ""},
+		{nil, "result != nil", false, ""},
+		{nil, "result == 0", false, ""},
+		{nil, "result != 0", true, ""},
+		{nil, "result >= 0", false, "invalid operation: <nil> >= int"},
+		{nil, "result == \"nil\"", false, ""},
+		{nil, "result != \"nil\"", true, ""},
+		{nil, "result == false", false, ""},
+		{nil, "result != false", true, ""},
+		{nil, "result == true", false, ""},
+		{nil, "result != true", true, ""},
+		{nil, "result == nil || result > 0", true, ""},
+		{nil, "result == nil && result != nil", false, ""},
+		{nil, "result == nil || result == false", true, ""},
+		{nil, "result == nil ? true : result > 0", true, ""},
+		{nil, "result == nil || result.subfield == 0", true, ""},
+		{nil, "result == nil || result[0] > 0.9", true, ""},
+		{nil, "result == nil ? true : shouldnotevaluate", false, "unknown name shouldnotevaluate"},
+		{1, "result == nil", false, ""},
+		{1, "result != nil && result == 1 ", true, ""},
+		{1, "result != nil && result > 0", true, ""},
+		{1.1, "result != nil && result <= 0 ", false, ""},
+		{1, "result != nil || result > 0", true, ""},
+		{1, "result == nil ? false : result > 0", true, ""},
+		{map[string]int{"foo": 1}, "result == nil", false, ""},
+	}
+	for _, test := range tests {
+		t.Run(test.expression, func(t *testing.T) {
+			b, err := EvalCondition(test.input, test.expression)
+			if test.expectedErr != "" {
+				assert.EqualError(t, err, test.expectedErr)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, test.expectation, b)
+		})
+	}
 }
 
 func TestEvaluateAsInt(t *testing.T) {
@@ -176,9 +235,10 @@ func TestEvaluateAsFloatError(t *testing.T) {
 	}
 	for _, test := range tests {
 		b, err := EvalCondition(test.input, test.expression)
-		assert.Error(t, err)
+		if assert.Error(t, err) {
+			assert.Regexp(t, test.errRegexp, err.Error())
+		}
 		assert.False(t, b)
-		assert.Regexp(t, test.errRegexp, err.Error())
 	}
 }
 
