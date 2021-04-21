@@ -58,26 +58,26 @@ endif
 define protoc
 	# protoc $(1)
     PATH=${DIST_DIR}:$$PATH protoc \
-      -I /usr/local/include \
-      -I . \
+      -I ./ \
       -I ./vendor \
       -I ${GOPATH}/src \
-      -I ${GOPATH}/pkg/mod/github.com/gogo/protobuf@v1.3.1/gogoproto \
-      -I ${GOPATH}/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis \
-      --gogofast_out=plugins=grpc:${GOPATH}/src \
+      -I ./vendor/github.com/googleapis/googleapis \
+      --go_out=plugins=grpc:${GOPATH}/src \
       --grpc-gateway_out=logtostderr=true:${GOPATH}/src \
       --swagger_out=logtostderr=true,fqn_for_swagger_name=true:. \
       $(1)
 endef
 
+
 .PHONY: all
 all: controller image
 
-# downloads vendor files needed by tools.go (i.e. gen-k8scodegen)
+# downloads vendor files needed by tools.go (i.e. make k8s-proto)
 .PHONY: go-mod-vendor
 go-mod-vendor:
 	go mod tidy
 	go mod vendor
+	modvendor -v -copy="**/*.proto" -include="github.com/googleapis/googleapis/google/api"
 
 .PHONY: $(DIST_DIR)/controller-gen
 $(DIST_DIR)/controller-gen:
@@ -85,23 +85,27 @@ $(DIST_DIR)/controller-gen:
 
 .PHONY: $(DIST_DIR)/go-to-protobuf
 $(DIST_DIR)/go-to-protobuf:
-	$(call go_install,k8s.io/code-generator/cmd/go-to-protobuf@v0.20.5-rc.0)
+	$(call go_install,k8s.io/code-generator/cmd/go-to-protobuf@v0.20.6)
+
+.PHONY: $(DIST_DIR)/protoc-gen-go
+$(DIST_DIR)/protoc-gen-go:
+	$(call go_install,github.com/golang/protobuf/protoc-gen-go@v1.5.2)
 
 .PHONY: $(DIST_DIR)/protoc-gen-gogo
 $(DIST_DIR)/protoc-gen-gogo:
-	$(call go_install,github.com/gogo/protobuf/protoc-gen-gogo@v1.3.1)
+	$(call go_install,github.com/gogo/protobuf/protoc-gen-gogo@v1.3.2)
 
 .PHONY: $(DIST_DIR)/protoc-gen-gogofast
 $(DIST_DIR)/protoc-gen-gogofast:
-	$(call go_install,github.com/gogo/protobuf/protoc-gen-gogofast@v1.3.1)
+	$(call go_install,github.com/gogo/protobuf/protoc-gen-gogofast@v1.3.2)
 
 .PHONY: $(DIST_DIR)/protoc-gen-grpc-gateway
 $(DIST_DIR)/protoc-gen-grpc-gateway:
-	$(call go_install,github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v1.16.0)
+	$(call go_install,github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.3.0)
 
-.PHONY: $(DIST_DIR)/protoc-gen-swagger
-$(DIST_DIR)/protoc-gen-swagger:
-	$(call go_install,github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v1.16.0)
+.PHONY: $(DIST_DIR)/protoc-gen-openapiv2
+$(DIST_DIR)/protoc-gen-openapiv2:
+	$(call go_install,github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.3.0)
 
 .PHONY: $(DIST_DIR)/openapi-gen
 $(DIST_DIR)/openapi-gen:
@@ -111,11 +115,15 @@ $(DIST_DIR)/openapi-gen:
 $(DIST_DIR)/mockery:
 	$(call go_install,github.com/vektra/mockery/v2@v2.6.0)
 
+.PHONY: $(DIST_DIR)/modvendor
+$(DIST_DIR)/modvendor:
+	$(call go_install,github.com/goware/modvendor@v0.3.0)
+
 TYPES := $(shell find pkg/apis/rollouts/v1alpha1 -type f -name '*.go' -not -name openapi_generated.go -not -name '*generated*' -not -name '*test.go')
 APIMACHINERY_PKGS=k8s.io/apimachinery/pkg/util/intstr,+k8s.io/apimachinery/pkg/api/resource,+k8s.io/apimachinery/pkg/runtime/schema,+k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/api/core/v1,k8s.io/api/batch/v1
 
 .PHONY: install-toolchain
-install-toolchain: $(DIST_DIR)/controller-gen $(DIST_DIR)/go-to-protobuf $(DIST_DIR)/protoc-gen-gogo $(DIST_DIR)/protoc-gen-gogofast $(DIST_DIR)/protoc-gen-grpc-gateway $(DIST_DIR)/protoc-gen-swagger
+install-toolchain: $(DIST_DIR)/controller-gen $(DIST_DIR)/go-to-protobuf $(DIST_DIR)/protoc-gen-go $(DIST_DIR)/protoc-gen-gogo $(DIST_DIR)/protoc-gen-gogofast $(DIST_DIR)/protoc-gen-grpc-gateway $(DIST_DIR)/protoc-gen-openapiv2 $(DIST_DIR)/modvendor
 
 # generates all auto-generated code
 .PHONY: codegen
@@ -123,7 +131,7 @@ codegen: gen-proto gen-k8scodegen gen-openapi gen-mocks gen-crd manifests
 
 # generates all files related to proto files
 .PHONY: gen-proto
-protogen: k8s-proto rollout-proto ui-proto
+gen-proto: k8s-proto api-proto ui-proto
 
 # generates the .proto files affected by changes to types.go
 .PHONY: k8s-proto

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
+	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 )
 
 // MustMarshal marshals an object and panics if it failures. This function should only be used
