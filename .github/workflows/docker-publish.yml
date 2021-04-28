@@ -5,8 +5,6 @@ on:
     branches:
       - master
       - release-*
-    tags:
-      - v*.*.*
 
   # Run tests for any PRs.
   pull_request:
@@ -58,7 +56,6 @@ jobs:
             ghcr.io/argoproj/argo-rollouts
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{version}}
 
       - name: Docker meta (plugin)
         id: plugin-meta
@@ -69,7 +66,6 @@ jobs:
             ghcr.io/argoproj/kubectl-argo-rollouts
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{version}}
 
       # avoid building linux/arm64 for PRs since it takes so long
       - name: Set Platform Matrix
