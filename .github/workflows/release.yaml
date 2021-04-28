@@ -1,13 +1,11 @@
-name: Docker
+name: Release
 
 on:
-  push:
-    branches:
-      - master
-      - release-*
-
-  # Run tests for any PRs.
-  pull_request:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to build release from
+        required: true
 
 jobs:
   docker:
@@ -16,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.tag }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -31,21 +31,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1 
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   if: github.event_name != 'pull_request'
+      #   uses: docker/login-action@v1 
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.repository_owner }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to Quay.io
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+      # - name: Login to Quay.io
+      #   if: github.event_name != 'pull_request'
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: quay.io
+      #     username: ${{ secrets.QUAY_USERNAME }}
+      #     password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
       - name: Docker meta (controller)
         id: controller-meta
@@ -55,7 +55,7 @@ jobs:
             quay.io/argoproj/argo-rollouts
             ghcr.io/argoproj/argo-rollouts
           tags: |
-            type=ref,event=branch
+            type=semver,pattern={{version}}
 
       - name: Docker meta (plugin)
         id: plugin-meta
@@ -65,23 +65,14 @@ jobs:
             quay.io/argoproj/kubectl-argo-rollouts
             ghcr.io/argoproj/kubectl-argo-rollouts
           tags: |
-            type=ref,event=branch
-
-      # avoid building linux/arm64 for PRs since it takes so long
-      - name: Set Platform Matrix
-        id: platform-matrix
-        run: |
-          PLATFORM_MATRIX=linux/amd64
-          if [ ${{ github.event_name != 'pull_request' }} = true ]; then
-            PLATFORM_MATRIX=$PLATFORM_MATRIX,linux/arm64
-          fi
-          echo "::set-output name=platform-matrix::$PLATFORM_MATRIX"
+            type=semver,pattern={{version}}
 
       - name: Build and push (controller)
         uses: docker/build-push-action@v2
         with:
-          platforms: ${{ steps.platform-matrix.outputs.platform-matrix }}
-          push: ${{ github.event_name != 'pull_request' }}
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
+          push: false
           tags: ${{ steps.controller-meta.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
@@ -90,8 +81,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           target: kubectl-argo-rollouts
-          platforms: ${{ steps.platform-matrix.outputs.platform-matrix }}
-          push: ${{ github.event_name != 'pull_request' }}
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
+          push: false
           tags: ${{ steps.plugin-meta.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
@@ -103,3 +95,20 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Generate release artifacts
+        run: |
+          make release-plugins
+          make manifests IMAGE_TAG=${{ inputs.tag }}
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            dist/kubectl-argo-rollouts-darwin
+            dist/kubectl-argo-rollouts-linux
+            manifests/install.yaml
+            manifests/cluster-install.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
