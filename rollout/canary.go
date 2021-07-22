@@ -17,7 +17,7 @@ import (
 
 func (c *rolloutContext) rolloutCanary() error {
 	var err error
-	if replicasetutil.PodTemplateOrStepsChanged(c.rollout, c.newRS) {
+	if rolloututil.PodTemplateOrStepsChanged(c.rollout, c.newRS) {
 		c.newRS, err = c.getAllReplicaSetsAndSyncRevision(false)
 		if err != nil {
 			return err
@@ -241,10 +241,10 @@ func (c *rolloutContext) syncRolloutStatusCanary() error {
 
 	currentStep, currentStepIndex := replicasetutil.GetCurrentCanaryStep(c.rollout)
 	newStatus.StableRS = c.rollout.Status.StableRS
-	newStatus.CurrentStepHash = conditions.ComputeStepHash(c.rollout)
+	newStatus.CurrentStepHash = rolloututil.ComputeStepHash(c.rollout)
 	stepCount := int32(len(c.rollout.Spec.Strategy.Canary.Steps))
 
-	if replicasetutil.PodTemplateOrStepsChanged(c.rollout, c.newRS) {
+	if rolloututil.PodTemplateOrStepsChanged(c.rollout, c.newRS) {
 		c.resetRolloutStatus(&newStatus)
 		if c.newRS != nil && c.rollout.Status.StableRS == replicasetutil.GetPodTemplateHash(c.newRS) {
 			if stepCount > 0 {

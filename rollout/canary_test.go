@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	k8sinformers "k8s.io/client-go/informers"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
-	"k8s.io/kubernetes/pkg/controller"
 	"k8s.io/utils/pointer"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
@@ -24,6 +23,7 @@ import (
 	"github.com/argoproj/argo-rollouts/utils/conditions"
 	logutil "github.com/argoproj/argo-rollouts/utils/log"
 	"github.com/argoproj/argo-rollouts/utils/record"
+	replicasetutil "github.com/argoproj/argo-rollouts/utils/replicaset"
 	rolloututil "github.com/argoproj/argo-rollouts/utils/rollout"
 )
 
@@ -36,8 +36,8 @@ func newCanaryRollout(name string, replicas int, revisionHistoryLimit *int32, st
 		Steps:          steps,
 	}
 	rollout.Status.CurrentStepIndex = stepIndex
-	rollout.Status.CurrentStepHash = conditions.ComputeStepHash(rollout)
-	rollout.Status.CurrentPodHash = controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	rollout.Status.CurrentStepHash = rolloututil.ComputeStepHash(rollout)
+	rollout.Status.CurrentPodHash = replicasetutil.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
 	rollout.Status.Selector = metav1.FormatLabelSelector(rollout.Spec.Selector)
 	rollout.Status.Phase, rollout.Status.Message = rolloututil.CalculateRolloutPhase(rollout.Spec, rollout.Status)
 	return rollout
@@ -52,8 +52,8 @@ func bumpVersion(rollout *v1alpha1.Rollout) *v1alpha1.Rollout {
 	newRevisionStr := strconv.FormatInt(int64(newRevision), 10)
 	annotations.SetRolloutRevision(newRollout, newRevisionStr)
 	newRollout.Spec.Template.Spec.Containers[0].Image = "foo/bar" + newRevisionStr
-	newRollout.Status.CurrentPodHash = controller.ComputeHash(&newRollout.Spec.Template, newRollout.Status.CollisionCount)
-	newRollout.Status.CurrentStepHash = conditions.ComputeStepHash(newRollout)
+	newRollout.Status.CurrentPodHash = replicasetutil.ComputeHash(&newRollout.Spec.Template, newRollout.Status.CollisionCount)
+	newRollout.Status.CurrentStepHash = rolloututil.ComputeStepHash(newRollout)
 	newRollout.Status.Phase, newRollout.Status.Message = rolloututil.CalculateRolloutPhase(newRollout.Spec, newRollout.Status)
 	return newRollout
 }
@@ -390,7 +390,7 @@ func TestResetCurrentStepIndexOnStepChange(t *testing.T) {
 	r2 := bumpVersion(r1)
 	expectedCurrentPodHash := r2.Status.CurrentPodHash
 	r2.Spec.Strategy.Canary.Steps = append(steps, v1alpha1.CanaryStep{Pause: &v1alpha1.RolloutPause{}})
-	expectedCurrentStepHash := conditions.ComputeStepHash(r2)
+	expectedCurrentStepHash := rolloututil.ComputeStepHash(r2)
 
 	rs1 := newReplicaSetWithStatus(r1, 10, 10)
 	rs1PodHash := rs1.Labels[v1alpha1.DefaultRolloutUniqueLabelKey]
@@ -738,7 +738,7 @@ func TestRollBackToStable(t *testing.T) {
 		}
 	}`
 	newConditions := generateConditionsPatch(true, conditions.ReplicaSetUpdatedReason, rs1, false, "")
-	expectedPatch := fmt.Sprintf(expectedPatchWithoutSub, controller.ComputeHash(&r2.Spec.Template, r2.Status.CollisionCount), newConditions)
+	expectedPatch := fmt.Sprintf(expectedPatchWithoutSub, replicasetutil.ComputeHash(&r2.Spec.Template, r2.Status.CollisionCount), newConditions)
 	patch := f.getPatchedRollout(patchIndex)
 	assert.Equal(t, calculatePatch(r2, expectedPatch), patch)
 }
@@ -826,8 +826,8 @@ func TestRollBackToStableAndStepChange(t *testing.T) {
 			"conditions": %s
 		}
 	}`
-	newPodHash := controller.ComputeHash(&r2.Spec.Template, r2.Status.CollisionCount)
-	newStepHash := conditions.ComputeStepHash(r2)
+	newPodHash := replicasetutil.ComputeHash(&r2.Spec.Template, r2.Status.CollisionCount)
+	newStepHash := rolloututil.ComputeStepHash(r2)
 	newConditions := generateConditionsPatch(true, conditions.ReplicaSetUpdatedReason, rs1, false, "")
 	expectedPatch := fmt.Sprintf(expectedPatchWithoutSub, newPodHash, newStepHash, newConditions)
 	patch := f.getPatchedRollout(patchIndex)

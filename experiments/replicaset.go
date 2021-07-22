@@ -13,7 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	patchtypes "k8s.io/apimachinery/pkg/types"
-	"k8s.io/kubernetes/pkg/controller"
 	labelsutil "k8s.io/kubernetes/pkg/util/labels"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
@@ -160,7 +159,7 @@ func newReplicaSetFromTemplate(experiment *v1alpha1.Experiment, template v1alpha
 			delete(newRSTemplate.Labels, v1alpha1.DefaultRolloutUniqueLabelKey)
 		}
 	}
-	podHash := controller.ComputeHash(&newRSTemplate, collisionCount)
+	podHash := replicasetutil.ComputeHash(&newRSTemplate, collisionCount)
 
 	newRSTemplate.Labels = labelsutil.CloneAndAddLabel(newRSTemplate.Labels, v1alpha1.DefaultRolloutUniqueLabelKey, podHash)
 	// Add podTemplateHash label to selector.

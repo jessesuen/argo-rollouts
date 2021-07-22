@@ -2,7 +2,10 @@ package replicaset
 
 import (
 	"context"
+	"encoding/binary"
+	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"sort"
 	"strconv"
 	"time"
@@ -15,6 +18,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	intstrutil "k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/kubernetes"
 	corev1defaults "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/controller"
@@ -22,7 +26,6 @@ import (
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	"github.com/argoproj/argo-rollouts/utils/annotations"
-	"github.com/argoproj/argo-rollouts/utils/conditions"
 	"github.com/argoproj/argo-rollouts/utils/defaults"
 	logutil "github.com/argoproj/argo-rollouts/utils/log"
 )
@@ -38,10 +41,20 @@ func FindNewReplicaSet(rollout *v1alpha1.Rollout, rsList []*appsv1.ReplicaSet) *
 	}
 	rsList = newRSList
 	sort.Sort(controller.ReplicaSetsByCreationTimestamp(rsList))
-	// First, attempt to find the replicaset by the replicaset naming formula
-	replicaSetName := fmt.Sprintf("%s-%s", rollout.Name, controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount))
+
+	rolloutHash := ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	replicaSetName := fmt.Sprintf("%s-%s", rollout.Name, rolloutHash)
+
+	legacyHash := controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	legacyReplicaSetName := fmt.Sprintf("%s-%s", rollout.Name, legacyHash)
+
+	// First, attempt to find the replicaset by the replicaset naming formula and hashing function.
+	// Check with our new hashing function first (introduced in Rollouts v1.1), but also check using
+	// k8s controller.ComputeHash (used in Rollouts v0.10 and below).
+	// Technically, the check against the legacyHash is unnecessary, because we anyways perform
+	// the PodTemplateEqualIgnoreHash() check below, but it is safer to do it anyway.
 	for _, rs := range rsList {
-		if rs.Name == replicaSetName {
+		if rs.Name == replicaSetName || rs.Name == legacyReplicaSetName {
 			return rs
 		}
 	}
@@ -86,7 +99,7 @@ func GetRolloutAffinity(rollout v1alpha1.Rollout) *v1alpha1.AntiAffinity {
 
 func GenerateReplicaSetAffinity(rollout v1alpha1.Rollout) *corev1.Affinity {
 	antiAffinityStrategy := GetRolloutAffinity(rollout)
-	currentPodHash := controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	currentPodHash := ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
 	affinitySpec := rollout.Spec.Template.Spec.Affinity.DeepCopy()
 	if antiAffinityStrategy != nil && rollout.Status.StableRS != "" && rollout.Status.StableRS != currentPodHash {
 		antiAffinityRule := CreateInjectedAntiAffinityRule(rollout)
@@ -192,7 +205,7 @@ func RemoveInjectedAntiAffinityRule(affinity *corev1.Affinity, rollout v1alpha1.
 
 func IfInjectedAntiAffinityRuleNeedsUpdate(affinity *corev1.Affinity, rollout v1alpha1.Rollout) bool {
 	_, podAffinityTerm := HasInjectedAntiAffinityRule(affinity, rollout)
-	currentPodHash := controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	currentPodHash := ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
 	if podAffinityTerm != nil && rollout.Status.StableRS != currentPodHash {
 		for _, labelSelectorRequirement := range podAffinityTerm.LabelSelector.MatchExpressions {
 			if labelSelectorRequirement.Key == v1alpha1.DefaultRolloutUniqueLabelKey && labelSelectorRequirement.Values[0] != rollout.Status.StableRS {
@@ -418,46 +431,19 @@ func MaxSurge(rollout *v1alpha1.Rollout) int32 {
 	return maxSurge
 }
 
-// checkStepHashChange indicates if the rollout's step for the strategy have changed. This causes the rollout to reset the
-// currentStepIndex to zero. If there was no previously recorded step hash to compare to the function defaults to true
-func checkStepHashChange(rollout *v1alpha1.Rollout) bool {
-	if rollout.Status.CurrentStepHash == "" {
-		return true
-	}
-	// TODO: conditions.ComputeStepHash is not stable and will change
-	stepsHash := conditions.ComputeStepHash(rollout)
-	if rollout.Status.CurrentStepHash != conditions.ComputeStepHash(rollout) {
-		logCtx := logutil.WithRollout(rollout)
-		logCtx.Infof("Canary steps change detected (new: %s, old: %s)", stepsHash, rollout.Status.CurrentStepHash)
-		return true
-	}
-	return false
-}
-
 // checkPodSpecChange indicates if the rollout spec has changed indicating that the rollout needs to reset the
 // currentStepIndex to zero. If there is no previous pod spec to compare to the function defaults to false
 func CheckPodSpecChange(rollout *v1alpha1.Rollout, newRS *appsv1.ReplicaSet) bool {
 	if rollout.Status.CurrentPodHash == "" {
 		return false
 	}
-	podHash := controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	podHash := ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
 	if newRS != nil {
 		podHash = GetPodTemplateHash(newRS)
 	}
 	if rollout.Status.CurrentPodHash != podHash {
 		logCtx := logutil.WithRollout(rollout)
 		logCtx.Infof("Pod template change detected (new: %s, old: %s)", podHash, rollout.Status.CurrentPodHash)
-		return true
-	}
-	return false
-}
-
-// PodTemplateOrStepsChanged detects if there is a change in either the pod template, or canary steps
-func PodTemplateOrStepsChanged(rollout *v1alpha1.Rollout, newRS *appsv1.ReplicaSet) bool {
-	if checkStepHashChange(rollout) {
-		return true
-	}
-	if CheckPodSpecChange(rollout, newRS) {
 		return true
 	}
 	return false
@@ -596,4 +582,27 @@ func GetPodsOwnedByReplicaSet(ctx context.Context, client kubernetes.Interface, 
 		}
 	}
 	return podOwnedByRS, nil
+}
+
+// ComputeHash returns a hash value calculated from a PodTemplateSpec. This is intended to replace
+// our use of k8s.io/kubernetes/pkg/ComputeHash(), which is unstable -- it is known to
+// return different hashes depending on k8s.io/kubernetes/pkg versions. By having our own hashing
+// function for a pod template, we can ensure that it is stable, which then lessens our reliance on
+// the PodTemplateEqualIgnoreHash() fallback mechanism, which is also potentially unstable.
+// A stable hash is achieved by json marshalling the template, and then hashing against the
+// generated string.
+func ComputeHash(template *corev1.PodTemplateSpec, collisionCount *int32) string {
+	podTemplateHasher := fnv.New32a()
+	templateBytes, err := json.Marshal(template)
+	if err != nil {
+		panic(err)
+	}
+	// Add collisionCount in the hash if it exists.
+	if collisionCount != nil {
+		collisionCountBytes := make([]byte, 8)
+		binary.LittleEndian.PutUint32(collisionCountBytes, uint32(*collisionCount))
+		podTemplateHasher.Write(collisionCountBytes)
+	}
+	podTemplateHasher.Write(templateBytes)
+	return rand.SafeEncodeString(fmt.Sprint(podTemplateHasher.Sum32()))
 }

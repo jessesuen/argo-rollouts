@@ -37,7 +37,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	corev1defaults "k8s.io/kubernetes/pkg/apis/core/v1"
-	"k8s.io/kubernetes/pkg/controller"
 	"k8s.io/utils/pointer"
 
 	"github.com/argoproj/argo-rollouts/controller/metrics"
@@ -397,7 +396,7 @@ func updateBaseRolloutStatus(r *v1alpha1.Rollout, availableReplicas, updatedRepl
 }
 
 func newReplicaSet(r *v1alpha1.Rollout, replicas int) *appsv1.ReplicaSet {
-	podHash := controller.ComputeHash(&r.Spec.Template, r.Status.CollisionCount)
+	podHash := replicasetutil.ComputeHash(&r.Spec.Template, r.Status.CollisionCount)
 	rsLabels := map[string]string{
 		v1alpha1.DefaultRolloutUniqueLabelKey: podHash,
 	}
@@ -1304,7 +1303,7 @@ func TestNoReconcileForDeletedRollout(t *testing.T) {
 }
 
 // TestComputeHashChangeTolerationBlueGreen verifies that we can tolerate a change in
-// controller.ComputeHash() for the blue-green strategy and do not redeploy any replicasets
+// replicasetutil.ComputeHash() for the blue-green strategy and do not redeploy any replicasets
 func TestComputeHashChangeTolerationBlueGreen(t *testing.T) {
 	f := newFixture(t)
 	defer f.Close()
@@ -1357,7 +1356,7 @@ func TestComputeHashChangeTolerationBlueGreen(t *testing.T) {
 }
 
 // TestComputeHashChangeTolerationCanary verifies that we can tolerate a change in
-// controller.ComputeHash() for the canary strategy and do not redeploy any replicasets
+// replicasetutil.ComputeHash() for the canary strategy and do not redeploy any replicasets
 func TestComputeHashChangeTolerationCanary(t *testing.T) {
 	f := newFixture(t)
 	defer f.Close()
@@ -1433,7 +1432,7 @@ func TestSwitchBlueGreenToCanary(t *testing.T) {
 				"currentStepHash": "%s",
 				"selector": "foo=bar"
 			}
-		}`, addedConditions, conditions.ComputeStepHash(r))
+		}`, addedConditions, rolloututil.ComputeStepHash(r))
 	assert.Equal(t, calculatePatch(r, expectedPatch), patch)
 }
 

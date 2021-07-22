@@ -11,12 +11,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	core "k8s.io/client-go/testing"
-	"k8s.io/kubernetes/pkg/controller"
 	"k8s.io/utils/pointer"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	"github.com/argoproj/argo-rollouts/utils/annotations"
 	"github.com/argoproj/argo-rollouts/utils/conditions"
+	replicasetutil "github.com/argoproj/argo-rollouts/utils/replicaset"
 	rolloututil "github.com/argoproj/argo-rollouts/utils/rollout"
 )
 
@@ -32,8 +32,8 @@ func newBlueGreenRollout(name string, replicas int, revisionHistoryLimit *int32,
 		PreviewService:             previewSvc,
 		AbortScaleDownDelaySeconds: &abortScaleDownDelaySeconds,
 	}
-	rollout.Status.CurrentStepHash = conditions.ComputeStepHash(rollout)
-	rollout.Status.CurrentPodHash = controller.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
+	rollout.Status.CurrentStepHash = rolloututil.ComputeStepHash(rollout)
+	rollout.Status.CurrentPodHash = replicasetutil.ComputeHash(&rollout.Spec.Template, rollout.Status.CollisionCount)
 	return rollout
 }
 

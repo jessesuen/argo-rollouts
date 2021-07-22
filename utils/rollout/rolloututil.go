@@ -1,13 +1,20 @@
 package rollout
 
 import (
+	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"strconv"
+
+	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	"github.com/argoproj/argo-rollouts/utils/annotations"
 	"github.com/argoproj/argo-rollouts/utils/conditions"
 	"github.com/argoproj/argo-rollouts/utils/defaults"
+	logutil "github.com/argoproj/argo-rollouts/utils/log"
+	replicasetutil "github.com/argoproj/argo-rollouts/utils/replicaset"
 )
 
 // GetRolloutPhase returns a status and message for a rollout. Takes into consideration whether
@@ -142,4 +149,49 @@ func CanaryStepString(c v1alpha1.CanaryStep) string {
 		}
 	}
 	return "invalid"
+}
+
+// checkStepHashChange indicates if the rollout's step for the strategy have changed. This causes the rollout to reset the
+// currentStepIndex to zero. If there was no previously recorded step hash to compare to the function defaults to true
+func checkStepHashChange(rollout *v1alpha1.Rollout) bool {
+	if rollout.Status.CurrentStepHash == "" {
+		return true
+	}
+	// TODO: rolloututil.ComputeStepHash is not stable and will change
+	stepsHash := ComputeStepHash(rollout)
+	if rollout.Status.CurrentStepHash != ComputeStepHash(rollout) {
+		logCtx := logutil.WithRollout(rollout)
+		logCtx.Infof("Canary steps change detected (new: %s, old: %s)", stepsHash, rollout.Status.CurrentStepHash)
+		return true
+	}
+	return false
+}
+
+// PodTemplateOrStepsChanged detects if there is a change in either the pod template, or canary steps
+func PodTemplateOrStepsChanged(rollout *v1alpha1.Rollout, newRS *appsv1.ReplicaSet) bool {
+	if checkStepHashChange(rollout) {
+		return true
+	}
+	if replicasetutil.CheckPodSpecChange(rollout, newRS) {
+		return true
+	}
+	return false
+}
+
+// ComputeStepHash returns a hash value calculated from the Rollout's steps. The hash will
+// be safe encoded to avoid bad words.
+func ComputeStepHash(rollout *v1alpha1.Rollout) string {
+	if rollout.Spec.Strategy.BlueGreen != nil || rollout.Spec.Strategy.Canary == nil {
+		return ""
+	}
+	rolloutStepHasher := fnv.New32a()
+	stepsBytes, err := json.Marshal(rollout.Spec.Strategy.Canary.Steps)
+	if err != nil {
+		panic(err)
+	}
+	_, err = rolloutStepHasher.Write(stepsBytes)
+	if err != nil {
+		panic(err)
+	}
+	return rand.SafeEncodeString(fmt.Sprint(rolloutStepHasher.Sum32()))
 }

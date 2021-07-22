@@ -1,16 +1,12 @@
 package conditions
 
 import (
-	"encoding/json"
-	"fmt"
-	"hash/fnv"
 	"strconv"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	"github.com/argoproj/argo-rollouts/utils/defaults"
@@ -262,24 +258,6 @@ func RolloutComplete(rollout *v1alpha1.Rollout, newStatus *v1alpha1.RolloutStatu
 		newStatus.AvailableReplicas == replicas &&
 		rollout.Status.ObservedGeneration == strconv.Itoa(int(rollout.Generation)) &&
 		completedStrategy
-}
-
-// ComputeStepHash returns a hash value calculated from the Rollout's steps. The hash will
-// be safe encoded to avoid bad words.
-func ComputeStepHash(rollout *v1alpha1.Rollout) string {
-	if rollout.Spec.Strategy.BlueGreen != nil || rollout.Spec.Strategy.Canary == nil {
-		return ""
-	}
-	rolloutStepHasher := fnv.New32a()
-	stepsBytes, err := json.Marshal(rollout.Spec.Strategy.Canary.Steps)
-	if err != nil {
-		panic(err)
-	}
-	_, err = rolloutStepHasher.Write(stepsBytes)
-	if err != nil {
-		panic(err)
-	}
-	return rand.SafeEncodeString(fmt.Sprint(rolloutStepHasher.Sum32()))
 }
 
 // RolloutTimedOut considers a rollout to have timed out once its condition that reports progress

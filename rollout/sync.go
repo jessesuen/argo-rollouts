@@ -139,7 +139,7 @@ func (c *rolloutContext) createDesiredReplicaSet() (*appsv1.ReplicaSet, error) {
 	newRSTemplate := *c.rollout.Spec.Template.DeepCopy()
 	// Add default anti-affinity rule if antiAffinity bool set and RSTemplate meets requirements
 	newRSTemplate.Spec.Affinity = replicasetutil.GenerateReplicaSetAffinity(*c.rollout)
-	podTemplateSpecHash := controller.ComputeHash(&c.rollout.Spec.Template, c.rollout.Status.CollisionCount)
+	podTemplateSpecHash := replicasetutil.ComputeHash(&c.rollout.Spec.Template, c.rollout.Status.CollisionCount)
 	newRSTemplate.Labels = labelsutil.CloneAndAddLabel(c.rollout.Spec.Template.Labels, v1alpha1.DefaultRolloutUniqueLabelKey, podTemplateSpecHash)
 	// Add podTemplateHash label to selector.
 	newRSSelector := labelsutil.CloneSelectorAndAddLabel(c.rollout.Spec.Selector, v1alpha1.DefaultRolloutUniqueLabelKey, podTemplateSpecHash)
@@ -418,7 +418,7 @@ func (c *rolloutContext) calculateBaseStatus() v1alpha1.RolloutStatus {
 		// newRS potentially might be nil when called by syncReplicasOnly(). For this
 		// to happen, the user would have had to simultaneously change the number of replicas, and
 		// the pod template spec at the same time.
-		currentPodHash = controller.ComputeHash(&c.rollout.Spec.Template, c.rollout.Status.CollisionCount)
+		currentPodHash = replicasetutil.ComputeHash(&c.rollout.Spec.Template, c.rollout.Status.CollisionCount)
 		c.log.Infof("Assuming %s for new replicaset pod hash", currentPodHash)
 	} else {
 		currentPodHash = c.newRS.Labels[v1alpha1.DefaultRolloutUniqueLabelKey]

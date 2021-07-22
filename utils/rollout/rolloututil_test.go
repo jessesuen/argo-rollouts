@@ -5,12 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
-	"github.com/argoproj/argo-rollouts/utils/annotations"
 	"github.com/tj/assert"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
+
+	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
+	"github.com/argoproj/argo-rollouts/utils/annotations"
 )
 
 func newCanaryRollout() *v1alpha1.Rollout {
@@ -358,4 +360,94 @@ func TestCanaryStepString(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, test.expectedString, CanaryStepString(test.step))
 	}
+}
+
+func TestCheckStepHashChange(t *testing.T) {
+	image := "nginx"
+	podLabels := map[string]string{"name": image}
+	ro := v1alpha1.Rollout{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        image,
+			Namespace:   metav1.NamespaceDefault,
+			Annotations: make(map[string]string),
+		},
+		Spec: v1alpha1.RolloutSpec{
+			Replicas: pointer.Int32Ptr(1),
+			Selector: &metav1.LabelSelector{MatchLabels: podLabels},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: podLabels,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:                   image,
+							Image:                  image,
+							ImagePullPolicy:        corev1.PullAlways,
+							TerminationMessagePath: corev1.TerminationMessagePathDefault,
+						},
+					},
+				},
+			},
+		},
+	}
+	ro.Spec.Strategy.Canary = &v1alpha1.CanaryStrategy{}
+	assert.True(t, checkStepHashChange(&ro))
+	ro.Status.CurrentStepHash = ComputeStepHash(&ro)
+	assert.False(t, checkStepHashChange(&ro))
+
+	ro.Status.CurrentStepHash = "different-hash"
+	assert.True(t, checkStepHashChange(&ro))
+}
+
+// TestComputeStableStepHash verifies we generate different hashes for various step definitions.
+// Also verifies we do not unintentionally break our ComputeStepHash function somehow (e.g. by
+// modifying types or change libraries)
+func TestComputeStepHash(t *testing.T) {
+	ro := &v1alpha1.Rollout{
+		Spec: v1alpha1.RolloutSpec{
+			Strategy: v1alpha1.RolloutStrategy{
+				Canary: &v1alpha1.CanaryStrategy{
+					Steps: []v1alpha1.CanaryStep{
+						{
+							Pause: &v1alpha1.RolloutPause{},
+						},
+					},
+				},
+			},
+		},
+	}
+	baseline := ComputeStepHash(ro)
+	roWithDiffSteps := ro.DeepCopy()
+	roWithDiffSteps.Spec.Strategy.Canary.Steps = []v1alpha1.CanaryStep{
+		{
+			Pause: &v1alpha1.RolloutPause{},
+		},
+		{
+			Pause: &v1alpha1.RolloutPause{},
+		},
+	}
+	roWithDiffStepsHash := ComputeStepHash(roWithDiffSteps)
+	assert.Equal(t, "79c9b9f6bf", roWithDiffStepsHash)
+
+	roWithSameSteps := ro.DeepCopy()
+	roWithSameSteps.Status.CurrentPodHash = "Test"
+	roWithSameSteps.Spec.Replicas = pointer.Int32Ptr(1)
+	roWithSameStepsHash := ComputeStepHash(roWithSameSteps)
+	assert.Equal(t, "6b9b86fbd5", roWithSameStepsHash)
+
+	roNoSteps := ro.DeepCopy()
+	roNoSteps.Spec.Strategy.Canary.Steps = nil
+	roNoStepsHash := ComputeStepHash(roNoSteps)
+	assert.Equal(t, "5ffbfbbd64", roNoStepsHash)
+
+	roBlueGreen := ro.DeepCopy()
+	roBlueGreen.Spec.Strategy.Canary = nil
+	roBlueGreen.Spec.Strategy.BlueGreen = &v1alpha1.BlueGreenStrategy{}
+	roBlueGreenHash := ComputeStepHash(roBlueGreen)
+	assert.Equal(t, "", roBlueGreenHash)
+
+	assert.NotEqual(t, baseline, roWithDiffStepsHash)
+	assert.Equal(t, baseline, roWithSameStepsHash)
+	assert.NotEqual(t, baseline, roNoStepsHash)
 }

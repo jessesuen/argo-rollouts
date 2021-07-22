@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	"github.com/argoproj/argo-rollouts/utils/annotations"
-	"github.com/argoproj/argo-rollouts/utils/conditions"
 )
 
 // generateRollout creates a rollout, with the input image as its template
@@ -58,14 +58,14 @@ func generateRollout(image string) v1alpha1.Rollout {
 // generateRS creates a replica set, with the input rollout's template as its template
 func generateRS(rollout v1alpha1.Rollout) appsv1.ReplicaSet {
 	template := rollout.Spec.Template.DeepCopy()
-	podTemplateHash := controller.ComputeHash(&rollout.Spec.Template, nil)
+	podTemplateHash := ComputeHash(&rollout.Spec.Template, nil)
 	template.Labels = map[string]string{
 		v1alpha1.DefaultRolloutUniqueLabelKey: podTemplateHash,
 	}
 	return appsv1.ReplicaSet{
 		ObjectMeta: metav1.ObjectMeta{
 			UID:    uuid.NewUUID(),
-			Name:   fmt.Sprintf("%s-%s", rollout.Name, controller.ComputeHash(&rollout.Spec.Template, nil)),
+			Name:   fmt.Sprintf("%s-%s", rollout.Name, ComputeHash(&rollout.Spec.Template, nil)),
 			Labels: template.Labels,
 		},
 		Spec: appsv1.ReplicaSetSpec{
@@ -627,22 +627,11 @@ func TestCheckPodSpecChange(t *testing.T) {
 	ro := generateRollout("nginx")
 	rs := generateRS(ro)
 	assert.False(t, CheckPodSpecChange(&ro, &rs))
-	ro.Status.CurrentPodHash = controller.ComputeHash(&ro.Spec.Template, ro.Status.CollisionCount)
+	ro.Status.CurrentPodHash = ComputeHash(&ro.Spec.Template, ro.Status.CollisionCount)
 	assert.False(t, CheckPodSpecChange(&ro, &rs))
 
 	ro.Status.CurrentPodHash = "different-hash"
 	assert.True(t, CheckPodSpecChange(&ro, &rs))
-}
-
-func TestCheckStepHashChange(t *testing.T) {
-	ro := generateRollout("nginx")
-	ro.Spec.Strategy.Canary = &v1alpha1.CanaryStrategy{}
-	assert.True(t, checkStepHashChange(&ro))
-	ro.Status.CurrentStepHash = conditions.ComputeStepHash(&ro)
-	assert.False(t, checkStepHashChange(&ro))
-
-	ro.Status.CurrentStepHash = "different-hash"
-	assert.True(t, checkStepHashChange(&ro))
 }
 
 func TestResetCurrentStepIndex(t *testing.T) {
@@ -818,7 +807,7 @@ func TestGenerateReplicaSetAffinity(t *testing.T) {
 	assert.Equal(t, "", ro.Status.StableRS)
 	assert.Nil(t, GenerateReplicaSetAffinity(ro))
 	// StableRS is equal to CurrentPodHash
-	ro.Status.StableRS = controller.ComputeHash(&ro.Spec.Template, nil)
+	ro.Status.StableRS = ComputeHash(&ro.Spec.Template, nil)
 	assert.Nil(t, GenerateReplicaSetAffinity(ro))
 
 	// Injects anti-affinity rule with RequiredDuringSchedulingIgnoredDuringExecution into empty RS Affinity object
@@ -1186,5 +1175,29 @@ func TestGetTimeRemainingBeforeScaleDownDeadline(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, remainingTime)
 	}
+
+}
+
+// TestComputeHash verifies our ComputeHash remains stable over time
+func TestComputeHash(t *testing.T) {
+	var template corev1.PodTemplateSpec
+	yaml.Unmarshal([]byte(`
+metadata:
+  labels:
+    app: foo
+spec:
+  containers:
+  - image: argoproj/rollouts-demo:blue
+    name: app
+`), &template)
+
+	// NOTE: the above pod template would hash to the following values depending on k8s library version
+	// hash := controller.ComputeHash(&ro.Spec.Template, nil)
+	// assert.Equal(t, "5c5f4fdfd8", hash) // Argo Rollouts v0.9.3   (k8s v1.17.3)
+	// assert.Equal(t, "5c5f4fdfd8", hash) // Argo Rollouts v0.10.2  (k8s v1.18.2)
+	// assert.Equal(t, "68f647646d", hash) // Argo Rollouts v1.0.2   (k8s.io/kubernetes v1.20.4)
+
+	hash := ComputeHash(&template, nil)
+	assert.Equal(t, "54f5987f88", hash) // This value has been verified across k8s versions v1.17.3, v1.18.2, v1.20.4
 
 }

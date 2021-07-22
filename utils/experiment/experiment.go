@@ -8,11 +8,11 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	patchtypes "k8s.io/apimachinery/pkg/types"
-	"k8s.io/kubernetes/pkg/controller"
 
 	"github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	rolloutsclient "github.com/argoproj/argo-rollouts/pkg/client/clientset/versioned/typed/rollouts/v1alpha1"
 	"github.com/argoproj/argo-rollouts/utils/defaults"
+	replicasetutil "github.com/argoproj/argo-rollouts/utils/replicaset"
 )
 
 var terminateExperimentPatch = []byte(`{"spec":{"terminate":true}}`)
@@ -131,7 +131,7 @@ func GetCollisionCountForTemplate(experiment *v1alpha1.Experiment, template v1al
 // ReplicasetNameFromExperiment gets the replicaset name based off of the experiment and the template
 func ReplicasetNameFromExperiment(experiment *v1alpha1.Experiment, template v1alpha1.TemplateSpec) string {
 	collisionCount := GetCollisionCountForTemplate(experiment, template)
-	podTemplateSpecHash := controller.ComputeHash(&template.Template, collisionCount)
+	podTemplateSpecHash := replicasetutil.ComputeHash(&template.Template, collisionCount)
 	return fmt.Sprintf("%s-%s-%s", experiment.Name, template.Name, podTemplateSpecHash)
 }
 
