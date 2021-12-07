@@ -8,9 +8,10 @@
       
       
       
+        <link rel="canonical" href="https://argoproj.github.io/argo-rollouts/features/traffic-management/alb/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.6">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
     
     
       
@@ -18,10 +19,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.875de78c.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.a617204b.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.f1a3b89f.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.9204c3b2.min.css">
         
           
           
@@ -35,17 +36,14 @@
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,400i,700%7C&display=fallback">
-        <style>:root{--md-text-font-family:"Work Sans";--md-code-font-family:""}</style>
+        <style>:root{--md-text-font:"Work Sans";--md-code-font:""}</style>
       
     
     
-    
+    <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-        
-<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-105170809-3","auto"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){var e;this.value&&(e=document.location.pathname,ga("send","pageview",e+"?q="+this.value))}),"undefined"!=typeof location$&&location$.subscribe(function(e){ga("send","pageview",e.pathname)})})</script>
-<script async src="https://www.google-analytics.com/analytics.js"></script>
-      
+
     
     
   </head>
@@ -59,7 +57,6 @@
     <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="">
   
     
-    <script>function __prefix(e){return new URL("../../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -76,7 +73,10 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+    
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../../.." title="Argo Rollouts - Kubernetes Progressive Delivery Controller" class="md-header__button md-logo" aria-label="Argo Rollouts - Kubernetes Progressive Delivery Controller" data-md-component="logo">
       
@@ -108,19 +108,22 @@
       <label class="md-header__button md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
       </label>
-      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
-      </button>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
@@ -137,8 +140,7 @@
     
     
       <div class="md-header__source">
-        
-<a href="https://github.com/argoproj/argo-rollouts/" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/argoproj/argo-rollouts/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -150,11 +152,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -179,8 +184,7 @@
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/argoproj/argo-rollouts/" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/argoproj/argo-rollouts/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -266,10 +270,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
-      <label class="md-nav__link" for="__nav_5">
-        Getting Started
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Getting Started" data-md-level="1">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
@@ -278,6 +286,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -288,8 +297,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -300,8 +311,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -312,8 +325,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -324,8 +339,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -336,8 +353,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -348,6 +367,7 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -383,10 +403,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
       
-      <label class="md-nav__link" for="__nav_7">
-        Rollout
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          Rollout
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Rollout" data-md-level="1">
         <label class="md-nav__title" for="__nav_7">
           <span class="md-nav__icon md-icon"></span>
@@ -395,6 +419,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -404,10 +429,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7_1" type="checkbox" id="__nav_7_1" >
       
-      <label class="md-nav__link" for="__nav_7_1">
-        Deployment Strategies
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7_1">
+          Deployment Strategies
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Deployment Strategies" data-md-level="2">
         <label class="md-nav__title" for="__nav_7_1">
           <span class="md-nav__icon md-icon"></span>
@@ -416,6 +445,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -426,8 +456,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -438,14 +470,17 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -456,8 +491,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -468,8 +505,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -480,8 +519,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -492,8 +533,24 @@
     </li>
   
 
+            
           
             
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scaledown-aborted-rs/" class="md-nav__link">
+        Scaledown Aborted Rollouts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
   
   
   
@@ -504,8 +561,24 @@
     </li>
   
 
+            
           
             
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../helm/" class="md-nav__link">
+        Helm
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
   
   
   
@@ -516,8 +589,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -528,6 +603,7 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -550,10 +626,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
       
-      <label class="md-nav__link" for="__nav_8">
-        Traffic Management
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Traffic Management
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Traffic Management" data-md-level="1">
         <label class="md-nav__title" for="__nav_8">
           <span class="md-nav__icon md-icon"></span>
@@ -562,6 +642,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -572,8 +653,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -584,8 +667,10 @@
     </li>
   
 
+            
           
             
+              
   
   
     
@@ -609,6 +694,7 @@
       </a>
       
         
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -659,9 +745,36 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#weight-verification" class="md-nav__link">
-    Weight verification
+  <a href="#zero-downtime-updates-with-aws-targetgroup-verification" class="md-nav__link">
+    Zero-Downtime Updates with AWS TargetGroup Verification
   </a>
+  
+    <nav class="md-nav" aria-label="Zero-Downtime Updates with AWS TargetGroup Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#targetgroup-ip-verification" class="md-nav__link">
+    TargetGroup IP Verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#targetgroup-weight-verification" class="md-nav__link">
+    TargetGroup Weight Verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -691,8 +804,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -703,8 +818,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -715,8 +832,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -727,6 +846,7 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -747,10 +867,14 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
       
-      <label class="md-nav__link" for="__nav_9">
-        Analysis
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Analysis
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Analysis" data-md-level="1">
         <label class="md-nav__title" for="__nav_9">
           <span class="md-nav__icon md-icon"></span>
@@ -759,6 +883,7 @@
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -769,8 +894,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -781,8 +908,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -793,8 +922,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -805,8 +936,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -817,8 +950,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -829,8 +964,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -841,8 +978,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -853,6 +992,21 @@
     </li>
   
 
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../analysis/cloudwatch/" class="md-nav__link">
+        CloudWatch
+      </a>
+    </li>
+  
+
+            
           
         </ul>
       </nav>
@@ -888,18 +1042,258 @@
       
         <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
       
-      <label class="md-nav__link" for="__nav_11">
-        Kubectl Plugin
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-      <nav class="md-nav" aria-label="Kubectl Plugin" data-md-level="1">
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          Notifications
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Notifications" data-md-level="1">
         <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          Notifications
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notifications/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11_2" type="checkbox" id="__nav_11_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11_2">
+          Services
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Services" data-md-level="2">
+        <label class="md-nav__title" for="__nav_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          Services
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/email/" class="md-nav__link">
+        Email
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/github/" class="md-nav__link">
+        GitHub
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/grafana/" class="md-nav__link">
+        Grafana
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/mattermost/" class="md-nav__link">
+        Mattermost
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/opsgenie/" class="md-nav__link">
+        Opsgenie
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/overview/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/rocketchat/" class="md-nav__link">
+        Rocket.Chat
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/slack/" class="md-nav__link">
+        Slack
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/teams/" class="md-nav__link">
+        Teams
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/telegram/" class="md-nav__link">
+        Telegram
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/webhook/" class="md-nav__link">
+        Webhook
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12" type="checkbox" id="__nav_12" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12">
+          Kubectl Plugin
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Kubectl Plugin" data-md-level="1">
+        <label class="md-nav__title" for="__nav_12">
           <span class="md-nav__icon md-icon"></span>
           Kubectl Plugin
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -910,8 +1304,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -919,20 +1315,25 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11_2" type="checkbox" id="__nav_11_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_12_2" type="checkbox" id="__nav_12_2" >
       
-      <label class="md-nav__link" for="__nav_11_2">
-        Commands
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_12_2">
+          Commands
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Commands" data-md-level="2">
-        <label class="md-nav__title" for="__nav_11_2">
+        <label class="md-nav__title" for="__nav_12_2">
           <span class="md-nav__icon md-icon"></span>
           Commands
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -943,8 +1344,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -955,8 +1358,24 @@
     </li>
   
 
+            
           
             
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_completion/" class="md-nav__link">
+        Rollouts Completion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
   
   
   
@@ -967,8 +1386,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -979,8 +1400,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -991,8 +1414,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1003,8 +1428,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1015,8 +1442,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1027,8 +1456,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1039,8 +1470,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1051,8 +1484,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1063,8 +1498,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1075,8 +1512,108 @@
     </li>
   
 
+            
           
             
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications/" class="md-nav__link">
+        Rollouts Notifications
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications_template/" class="md-nav__link">
+        Rollouts Notifications Template
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications_template_get/" class="md-nav__link">
+        Rollouts Notifications Template Get
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications_template_notify/" class="md-nav__link">
+        Rollouts Notifications Template Notify
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications_trigger/" class="md-nav__link">
+        Rollouts Notifications Trigger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications_trigger_get/" class="md-nav__link">
+        Rollouts Notifications Trigger Get
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/kubectl-argo-rollouts/kubectl-argo-rollouts_notifications_trigger_run/" class="md-nav__link">
+        Rollouts Notifications Trigger Run
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
   
   
   
@@ -1087,8 +1624,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1099,8 +1638,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1111,8 +1652,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1123,8 +1666,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1135,8 +1680,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1147,8 +1694,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1159,8 +1708,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1171,8 +1722,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1183,8 +1736,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1195,8 +1750,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1207,8 +1764,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1219,8 +1778,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1231,8 +1792,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1243,12 +1806,14 @@
     </li>
   
 
+            
           
         </ul>
       </nav>
     </li>
   
 
+            
           
         </ul>
       </nav>
@@ -1342,20 +1907,25 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_17" type="checkbox" id="__nav_17" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_18" type="checkbox" id="__nav_18" >
       
-      <label class="md-nav__link" for="__nav_17">
-        Contributing
-        <span class="md-nav__icon md-icon"></span>
-      </label>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_18">
+          Contributing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <nav class="md-nav" aria-label="Contributing" data-md-level="1">
-        <label class="md-nav__title" for="__nav_17">
+        <label class="md-nav__title" for="__nav_18">
           <span class="md-nav__icon md-icon"></span>
           Contributing
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
             
+              
   
   
   
@@ -1366,8 +1936,10 @@
     </li>
   
 
+            
           
             
+              
   
   
   
@@ -1378,6 +1950,21 @@
     </li>
   
 
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../releasing/" class="md-nav__link">
+        Releasing
+      </a>
+    </li>
+  
+
+            
           
         </ul>
       </nav>
@@ -1442,6 +2029,7 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -1492,9 +2080,36 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#weight-verification" class="md-nav__link">
-    Weight verification
+  <a href="#zero-downtime-updates-with-aws-targetgroup-verification" class="md-nav__link">
+    Zero-Downtime Updates with AWS TargetGroup Verification
   </a>
+  
+    <nav class="md-nav" aria-label="Zero-Downtime Updates with AWS TargetGroup Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#targetgroup-ip-verification" class="md-nav__link">
+    TargetGroup IP Verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#targetgroup-weight-verification" class="md-nav__link">
+    TargetGroup Weight Verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1529,12 +2144,12 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/argoproj/argo-rollouts/edit/master/docs/features/traffic-management/alb.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                <h1 id="aws-load-balancer-controller-alb">AWS Load Balancer Controller (ALB)<a class="headerlink" href="#aws-load-balancer-controller-alb" title="Permanent link">&para;</a></h1>
+<a href="https://github.com/argoproj/argo-rollouts/edit/master/docs/features/traffic-management/alb.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+<h1 id="aws-load-balancer-controller-alb">AWS Load Balancer Controller (ALB)<a class="headerlink" href="#aws-load-balancer-controller-alb" title="Permanent link">&para;</a></h1>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li>AWS Load Balancer Controller v1.1.5 or greater</li>
@@ -1610,7 +2225,7 @@ annotation, containing a JSON payload understood by the AWS Load Balancer Contro
 to split traffic between the <code>canaryService</code> and <code>stableService</code> according to the current canary weight. </p>
 <p>The following is an example of our example Ingress after the rollout has injected the custom action 
 annotation that splits traffic between the canary-service and stable-service, with a traffic weight
-of 80 and 20 respectively:</p>
+of 10 and 90 respectively:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">networking.k8s.io/v1beta1</span>
 <span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Ingress</span>
 <span class="nt">metadata</span><span class="p">:</span>
@@ -1673,22 +2288,94 @@ alb specification:</p>
           <span class="nt">rootService</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">guestbook-root</span>
 <span class="nn">...</span>
 </code></pre></div>
-<h3 id="weight-verification">Weight verification<a class="headerlink" href="#weight-verification" title="Permanent link">&para;</a></h3>
+<h3 id="zero-downtime-updates-with-aws-targetgroup-verification">Zero-Downtime Updates with AWS TargetGroup Verification<a class="headerlink" href="#zero-downtime-updates-with-aws-targetgroup-verification" title="Permanent link">&para;</a></h3>
+<p>Argo Rollouts contains two features to help ensure zero-downtime updates when used with the AWS 
+LoadBalancer controller: TargetGroup IP verification and TargetGroup weight verification. Both
+features involve the Rollout controller performing additional safety checks to AWS, to verify
+the changes made to the Ingress object are reflected in the underlying AWS TargetGroup.</p>
+<h4 id="targetgroup-ip-verification">TargetGroup IP Verification<a class="headerlink" href="#targetgroup-ip-verification" title="Permanent link">&para;</a></h4>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Since Argo Rollouts v1.0</p>
+<p>Target Group IP verification available since Argo Rollouts v1.1</p>
 </div>
-<p>When Argo Rollouts adjusts a canary weight by updating the Ingress annotation, it assumes that
-the new weight immediately takes effect and moves on to the next step. However, due to external
-factors (e.g. AWS rate limiting, AWS load balancer controller downtime) it is possible that the
-ingress modification may take a long time to take effect (or possibly never even made). This is
-potentially dangerous when the rollout completes its steps, it will scale down the old stack. If
-the ALB Rules/Actions were still directing traffic to the old stack (because the weights never took
-effect), then this would cause downtime to the service when the old stack was scaled down.</p>
-<p>To mitigate this, the rollout controller has a feature to additionally <em>verify</em> the canary weight 
-after a <code>setWeight</code> canary step. It accomplishes this by querying AWS LoadBalancer APIs directly,
-to confirm that the Rules, Actions, and TargetGroups reflect the desire of Ingress annotation.
-To enable ALB weight verification, add <code>--alb-verify-weight</code> flag to the rollout-controller flags:</p>
+<p>The AWS LoadBalancer controller can run in one of two modes:</p>
+<ul>
+<li><a href="https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/how-it-works/#instance-mode">Instance mode</a></li>
+<li><a href="https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/how-it-works/#ip-mode">IP mode</a></li>
+</ul>
+<p>TargetGroup IP Verification is only applicable when the AWS LoadBalancer controller in IP mode.
+When using the AWS LoadBalancer controller in IP mode (e.g. using the AWS CNI), the ALB LoadBalancer
+targets individual Pod IPs, as opposed to K8s node instances. Targeting Pod IPs comes with an
+increased risk of downtime during an update, because the Pod IPs behind the underlying AWS TargetGroup
+can more easily become outdated from the <em><em>actual</em></em> availability and status of pods, causing HTTP 502
+errors when the TargetGroup points to pods which have already been scaled down.</p>
+<p>To mitigate this risk, AWS recommends the use of
+<a href="https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/deploy/pod_readiness_gate/">pod readiness gate injection</a>
+when running the AWS LoadBalancer in IP mode. Readiness gates allow for the AWS LoadBalancer 
+controller to verify that TargetGroups are accurate before marking newly created Pods as "ready",
+preventing premature scale down of the older ReplicaSet.</p>
+<p>Pod readiness gate injection uses a mutating webhook which decides to inject readiness gates when a
+pod is created based on the following conditions:  </p>
+<ul>
+<li>There exists a service matching the pod labels in the same namespace</li>
+<li>There exists at least one target group binding that refers to the matching service</li>
+</ul>
+<p>Another way to describe this is: the AWS LoadBalancer controller injects readiness gates onto Pods
+only if they are "reachable"  from an ALB Ingress at the time of pod creation. A pod is considered
+reachable if an (ALB) Ingress references a Service which matches the pod labels. It ignores all other Pods.</p>
+<p>One challenge with this manner of pod readiness gate injection, is that modifications to the Service
+selector labels (<code>spec.selector</code>) do not allow for the AWS LoadBalancer controller to inject the
+readiness gates, because by that time the Pod was already created (and readiness gates are immutable).
+Note that this is an issue when you change Service selectors of <em><em>any</em></em> ALB Service, not just ones
+involved in Argo Rollouts.</p>
+<p>Because Argo Rollout's blue-green strategy works by modifying the activeService selector to the new
+ReplicaSet labels during promotion, it suffers from the issue where readiness gates for the
+<code>spec.strategy.blueGreen.activeService</code> fail to be injected. This means there is a possibility of
+downtime in the following problematic scenario during an update from V1 to V2:</p>
+<ol>
+<li>Update is triggered and V2 ReplicaSet stack is scaled up</li>
+<li>V2 ReplicaSet pods become fully available and ready to be promoted</li>
+<li>Rollout promotes V2 by updating the label selectors of the active service to point to the V2 stack (from V1)</li>
+<li>Due to unknown issues (e.g. AWS load balancer controller downtime, AWS rate limiting), registration
+   of the V2 Pod IPs to the TargetGroup does not happen or is delayed.</li>
+<li>V1 ReplicaSet is scaled down to complete the update</li>
+</ol>
+<p>After step 5, when the V1 ReplicaSet is scaled down, the outdated TargetGroup would still be pointing
+to the V1 Pods IPs which no longer exist, causing downtime. </p>
+<p>To allow for zero-downtime updates, Argo Rollouts has the ability to perform TargetGroup IP
+verification as an additional safety measure during an update. When this feature is enabled, whenever
+a service selector modification is made, the Rollout controller blocks progression of the update
+until it can verify the TargetGroup is accurately targeting the new Pod IPs of the
+<code>bluegreen.activeService</code>. Verification is achieved by querying AWS APIs to describe the underlying
+TargetGroup, iterating its registered IPs, and ensuring all Pod IPs of the activeService's
+<code>Endpoints</code> list are registered in the TargetGroup. Verification must succeed before running
+postPromotionAnalysis or scaling down the old ReplicaSet.</p>
+<p>Similarly for the canary strategy, after updating the <code>canary.stableService</code> selector labels to
+point to the new ReplicaSet, the TargetGroup IP verification feature allows the controller to block
+the scale down of the old ReplicaSet until it verifies the Pods IP behind the stableService
+TargetGroup are accurate.</p>
+<h4 id="targetgroup-weight-verification">TargetGroup Weight Verification<a class="headerlink" href="#targetgroup-weight-verification" title="Permanent link">&para;</a></h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>TargetGroup weight verification available since Argo Rollouts v1.0</p>
+</div>
+<p>TargetGroup weight verification addresses a similar problem to TargetGroup IP verification, but
+instead of verifying that the Pod IPs of a service are reflected accurately in the TargetGroup, the
+controller verifies that the traffic <em><em>weights</em></em> are accurate from what was set in the ingress
+annotations. Weight verification is applicable to AWS LoadBalancer controllers which are running
+either in IP mode or Instance mode.</p>
+<p>After Argo Rollouts adjusts a canary weight by updating the Ingress annotation, it moves on to the
+next step. However, due to external factors (e.g. AWS rate limiting, AWS load balancer controller
+downtime) it is possible that the weight modifications made to the Ingress, did not take effect in
+the underlying TargetGroup. This is potentially dangerous as the controller will believe it is safe
+to scale down the old stable stack when in reality, the outdated TargetGroup may still be pointing
+to it.</p>
+<p>Using the TargetGroup weight verification feature, the rollout controller will additionally <em>verify</em>
+the canary weight after a <code>setWeight</code> canary step. It accomplishes this by querying AWS LoadBalancer
+APIs directly, to confirm that the Rules, Actions, and TargetGroups reflect the desire of Ingress
+annotation.</p>
+<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h4>
+<p>To enable AWS target group verification, add <code>--aws-verify-target-group</code> flag to the rollout-controller flags:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
 <span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Deployment</span>
 <span class="nt">metadata</span><span class="p">:</span>
@@ -1698,17 +2385,29 @@ To enable ALB weight verification, add <code>--alb-verify-weight</code> flag to 
     <span class="nt">spec</span><span class="p">:</span>
       <span class="nt">containers</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">argo-rollouts</span>
-        <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">--alb-verify-weight</span><span class="p p-Indicator">]</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">--aws-verify-target-group</span><span class="p p-Indicator">]</span>
+        <span class="c1"># NOTE: in v1.0, the --alb-verify-weight flag should be used instead</span>
 </code></pre></div>
 <p>For this feature to work, the argo-rollouts deployment requires the following AWS API permissions
 under the <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/Welcome.html">Elastic Load Balancing API</a>:</p>
-<ul>
-<li><code>DescribeTargetGroups</code></li>
-<li><code>DescribeLoadBalancers</code></li>
-<li><code>DescribeListeners</code></li>
-<li><code>DescribeRules</code></li>
-<li><code>DescribeTags</code></li>
-</ul>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+    <span class="nt">&quot;Version&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;Statement&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;Action&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;elasticloadbalancing:DescribeTargetGroups&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;elasticloadbalancing:DescribeLoadBalancers&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;elasticloadbalancing:DescribeListeners&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;elasticloadbalancing:DescribeRules&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;elasticloadbalancing:DescribeTags&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;elasticloadbalancing:DescribeTargetHealth&quot;</span>
+            <span class="p">],</span>
+            <span class="nt">&quot;Resource&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Effect&quot;</span><span class="p">:</span> <span class="s2">&quot;Allow&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>There are various ways of granting AWS privileges to the argo-rollouts pods, which is highly
 dependent to your cluster's AWS environment, and out-of-scope of this documentation. Some solutions
 include:</p>
@@ -1735,7 +2434,7 @@ object will be annotated in a manner understood by the cluster's aws load balanc
           <span class="nt">annotationPrefix</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">custom.alb.ingress.kubernetes.io</span>
 </code></pre></div>
 <h3 id="custom-kubernetesioingressclass">Custom kubernetes.io/ingress.class<a class="headerlink" href="#custom-kubernetesioingressclass" title="Permanent link">&para;</a></h3>
-<p>By default, Argo Rollout will operates on Ingresses with the annotation:</p>
+<p>By default, Argo Rollout will operate on Ingresses with the annotation:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">networking.k8s.io/v1beta1</span>
 <span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Ingress</span>
 <span class="nt">metadata</span><span class="p">:</span>
@@ -1750,11 +2449,6 @@ controller should operate on multiple values. This may be desired when a cluster
 Ingress controllers that operate on different <code>kubernetes.io/ingress.class</code> values.</p>
 <p>If the controller needs to operate on any Ingress without the <code>kubernetes.io/ingress.class</code>
 annotation, the flag can be specified with an empty string (e.g. <code>--alb-ingress-classes ''</code>).</p>
-                
-              
-              
-                
-
 
               
             </article>
@@ -1763,12 +2457,12 @@ annotation, the flag can be specified with an empty string (e.g. <code>--alb-ing
         
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
-        <a href="../ambassador/" class="md-footer__link md-footer__link--prev" rel="prev">
+        
+        <a href="../ambassador/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Ambassador" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1783,7 +2477,8 @@ annotation, the flag can be specified with an empty string (e.g. <code>--alb-ing
         </a>
       
       
-        <a href="../istio/" class="md-footer__link md-footer__link--next" rel="next">
+        
+        <a href="../istio/" class="md-footer__link md-footer__link--next" aria-label="Next: Istio" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
@@ -1801,14 +2496,15 @@ annotation, the flag can be specified with an empty string (e.g. <code>--alb-ing
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
-        
-      </div>
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
     </div>
   </div>
@@ -1818,10 +2514,10 @@ annotation, the flag can be specified with an empty string (e.g. <code>--alb-ing
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../../assets/javascripts/workers/search.d351de03.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.34eae1b6.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
       
     
   </body>
