@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://argoproj.github.io/argo-rollouts/generated/kubectl-argo-rollouts/kubectl-argo-rollouts_completion/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.6">
     
     
       
@@ -19,10 +19,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.a617204b.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.cd566b2a.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.9204c3b2.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
         
           
           
@@ -39,6 +39,8 @@
         <style>:root{--md-text-font:"Work Sans";--md-code-font:""}</style>
       
     
+    
+      <link rel="stylesheet" href="../../../assets/versions.css">
     
     <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -978,6 +980,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../notification-services/alertmanager/" class="md-nav__link">
+        Alertmanager
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../notification-services/email/" class="md-nav__link">
         Email
       </a>
@@ -994,6 +1010,20 @@
     <li class="md-nav__item">
       <a href="../../notification-services/github/" class="md-nav__link">
         GitHub
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notification-services/googlechat/" class="md-nav__link">
+        Google Chat
       </a>
     </li>
   
@@ -1050,6 +1080,20 @@
     <li class="md-nav__item">
       <a href="../../notification-services/overview/" class="md-nav__link">
         Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notification-services/pushover/" class="md-nav__link">
+        Pushover
       </a>
     </li>
   
@@ -2033,42 +2077,42 @@
 <p>Generate completion script</p>
 <h2 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h2>
 <p>To load completions:</p>
-<div class="codehilite"><pre><span></span><code><span class="n">Bash</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="n">Bash</span><span class="p">:</span><span class="w"></span>
 
-  <span class="o">$</span> <span class="n">source</span> <span class="o">&lt;</span><span class="p">(</span><span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">bash</span><span class="p">)</span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">&lt;</span><span class="p">(</span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">bash</span><span class="p">)</span><span class="w"></span>
 
-  <span class="c1"># To load completions for each session, execute once:</span>
-  <span class="c1"># Linux:</span>
-  <span class="o">$</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">bash</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">bash_completion</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">yourprogram</span>
-  <span class="c1"># macOS:</span>
-  <span class="o">$</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">bash</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">bash_completion</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">yourprogram</span>
+<span class="w">  </span><span class="c1"># To load completions for each session, execute once:</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># Linux:</span><span class="w"></span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">bash</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">bash_completion</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">yourprogram</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># macOS:</span><span class="w"></span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">bash</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">bash_completion</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">yourprogram</span><span class="w"></span>
 
-<span class="n">Zsh</span><span class="p">:</span>
+<span class="n">Zsh</span><span class="p">:</span><span class="w"></span>
 
-  <span class="c1"># If shell completion is not already enabled in your environment,</span>
-  <span class="c1"># you will need to enable it.  You can execute the following once:</span>
+<span class="w">  </span><span class="c1"># If shell completion is not already enabled in your environment,</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># you will need to enable it.  You can execute the following once:</span><span class="w"></span>
 
-  <span class="o">$</span> <span class="n">echo</span> <span class="s2">&quot;autoload -U compinit; compinit&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">~/.</span><span class="n">zshrc</span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s2">&quot;autoload -U compinit; compinit&quot;</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">~/.</span><span class="n">zshrc</span><span class="w"></span>
 
-  <span class="c1"># To load completions for each session, execute once:</span>
-  <span class="o">$</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">zsh</span> <span class="o">&gt;</span> <span class="s2">&quot;${fpath[1]}/_yourprogram&quot;</span>
+<span class="w">  </span><span class="c1"># To load completions for each session, execute once:</span><span class="w"></span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">zsh</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="s2">&quot;${fpath[1]}/_yourprogram&quot;</span><span class="w"></span>
 
-  <span class="c1"># You will need to start a new shell for this setup to take effect.</span>
+<span class="w">  </span><span class="c1"># You will need to start a new shell for this setup to take effect.</span><span class="w"></span>
 
-<span class="n">fish</span><span class="p">:</span>
+<span class="n">fish</span><span class="p">:</span><span class="w"></span>
 
-  <span class="o">$</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">fish</span> <span class="o">|</span> <span class="n">source</span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">fish</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">source</span><span class="w"></span>
 
-  <span class="c1"># To load completions for each session, execute once:</span>
-  <span class="o">$</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">fish</span> <span class="o">&gt;</span> <span class="o">~/.</span><span class="n">config</span><span class="o">/</span><span class="n">fish</span><span class="o">/</span><span class="n">completions</span><span class="o">/</span><span class="n">yourprogram</span><span class="o">.</span><span class="n">fish</span>
+<span class="w">  </span><span class="c1"># To load completions for each session, execute once:</span><span class="w"></span>
+<span class="w">  </span><span class="o">$</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">fish</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">~/.</span><span class="n">config</span><span class="o">/</span><span class="n">fish</span><span class="o">/</span><span class="n">completions</span><span class="o">/</span><span class="n">yourprogram</span><span class="o">.</span><span class="n">fish</span><span class="w"></span>
 
-<span class="n">PowerShell</span><span class="p">:</span>
+<span class="n">PowerShell</span><span class="p">:</span><span class="w"></span>
 
-  <span class="n">PS</span><span class="o">&gt;</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">powershell</span> <span class="o">|</span> <span class="n">Out</span><span class="o">-</span><span class="nb nb-Type">String</span> <span class="o">|</span> <span class="n">Invoke</span><span class="o">-</span><span class="n">Expression</span>
+<span class="w">  </span><span class="n">PS</span><span class="o">&gt;</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">powershell</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Out</span><span class="o">-</span><span class="nb nb-Type">String</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Invoke</span><span class="o">-</span><span class="n">Expression</span><span class="w"></span>
 
-  <span class="c1"># To load completions for every new session, run:</span>
-  <span class="n">PS</span><span class="o">&gt;</span> <span class="n">yourprogram</span> <span class="n">completion</span> <span class="n">powershell</span> <span class="o">&gt;</span> <span class="n">yourprogram</span><span class="o">.</span><span class="n">ps1</span>
-  <span class="c1"># and source this file from your PowerShell profile.</span>
+<span class="w">  </span><span class="c1"># To load completions for every new session, run:</span><span class="w"></span>
+<span class="w">  </span><span class="n">PS</span><span class="o">&gt;</span><span class="w"> </span><span class="n">yourprogram</span><span class="w"> </span><span class="n">completion</span><span class="w"> </span><span class="n">powershell</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">yourprogram</span><span class="o">.</span><span class="n">ps1</span><span class="w"></span>
+<span class="w">  </span><span class="c1"># and source this file from your PowerShell profile.</span><span class="w"></span>
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code>kubectl argo rollouts completion <span class="o">[</span>bash<span class="p">|</span>zsh<span class="p">|</span>fish<span class="p">|</span>powershell<span class="o">]</span>
@@ -2165,10 +2209,12 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.22074ed6.min.js"}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.1514a9a0.min.js"></script>
+      
+        <script src="../../../assets/versions.js"></script>
       
     
   </body>

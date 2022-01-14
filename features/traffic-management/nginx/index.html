@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://argoproj.github.io/argo-rollouts/features/traffic-management/nginx/">
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.6">
     
     
       
@@ -19,10 +19,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.a617204b.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.cd566b2a.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.9204c3b2.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
         
           
           
@@ -39,6 +39,8 @@
         <style>:root{--md-text-font:"Work Sans";--md-code-font:""}</style>
       
     
+    
+      <link rel="stylesheet" href="../../../assets/versions.css">
     
     <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -1028,6 +1030,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../generated/notification-services/alertmanager/" class="md-nav__link">
+        Alertmanager
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../generated/notification-services/email/" class="md-nav__link">
         Email
       </a>
@@ -1044,6 +1060,20 @@
     <li class="md-nav__item">
       <a href="../../../generated/notification-services/github/" class="md-nav__link">
         GitHub
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/googlechat/" class="md-nav__link">
+        Google Chat
       </a>
     </li>
   
@@ -1100,6 +1130,20 @@
     <li class="md-nav__item">
       <a href="../../../generated/notification-services/overview/" class="md-nav__link">
         Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/notification-services/pushover/" class="md-nav__link">
+        Pushover
       </a>
     </li>
   
@@ -2009,21 +2053,21 @@
 <p>You can provide additional annotations to add to the canary Ingress via the <code>additionalIngressAnnotations</code> field to enable features like routing by header or cookie.</p>
 <h2 id="integration-with-argo-rollouts">Integration with Argo Rollouts<a class="headerlink" href="#integration-with-argo-rollouts" title="Permanent link">&para;</a></h2>
 <p>There are a couple of required fields in a Rollout to send split traffic between versions using Nginx. Below is an example of a Rollout with those fields:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span>
-<span class="nt">kind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Rollout</span>
-<span class="nt">spec</span><span class="p">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">...</span>
-  <span class="l l-Scalar l-Scalar-Plain">strategy</span><span class="p p-Indicator">:</span>
-    <span class="nt">canary</span><span class="p">:</span>
-      <span class="nt">canaryService</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">canary-service</span>  <span class="c1"># required</span>
-      <span class="nt">stableService</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">stable-service</span>  <span class="c1"># required</span>
-      <span class="nt">trafficRouting</span><span class="p">:</span>
-        <span class="nt">nginx</span><span class="p">:</span>
-          <span class="nt">stableIngress</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">primary-ingress</span>  <span class="c1"># required</span>
-          <span class="nt">annotationPrefix</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">customingress.nginx.ingress.kubernetes.io</span> <span class="c1"># optional</span>
-          <span class="nt">additionalIngressAnnotations</span><span class="p">:</span>   <span class="c1"># optional</span>
-            <span class="nt">canary-by-header</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">X-Canary</span>
-            <span class="nt">canary-by-header-value</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">iwantsit</span>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argoproj.io/v1alpha1</span><span class="w"></span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rollout</span><span class="w"></span>
+<span class="nt">spec</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w"></span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">strategy</span><span class="p p-Indicator">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">canary</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">canaryService</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canary-service</span><span class="w">  </span><span class="c1"># required</span><span class="w"></span>
+<span class="w">      </span><span class="nt">stableService</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stable-service</span><span class="w">  </span><span class="c1"># required</span><span class="w"></span>
+<span class="w">      </span><span class="nt">trafficRouting</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">nginx</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="nt">stableIngress</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">primary-ingress</span><span class="w">  </span><span class="c1"># required</span><span class="w"></span>
+<span class="w">          </span><span class="nt">annotationPrefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">customingress.nginx.ingress.kubernetes.io</span><span class="w"> </span><span class="c1"># optional</span><span class="w"></span>
+<span class="w">          </span><span class="nt">additionalIngressAnnotations</span><span class="p">:</span><span class="w">   </span><span class="c1"># optional</span><span class="w"></span>
+<span class="w">            </span><span class="nt">canary-by-header</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X-Canary</span><span class="w"></span>
+<span class="w">            </span><span class="nt">canary-by-header-value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">iwantsit</span><span class="w"></span>
 </code></pre></div>
 <p>The stable Ingress field is a reference to an Ingress in the same namespace of the Rollout. The Rollout requires the primary Ingress routes traffic to the stable Service. The Rollout checks that condition by confirming the Ingress has a backend that matches the Rollout's stableService.</p>
 <p>The controller routes traffic to the canary Service by creating a second Ingress with the canary annotations. As the Rollout progresses through the Canary steps, the controller updates the canary Ingress's canary annotations to reflect the desired state of the Rollout enabling traffic splitting between two different versions.</p>
@@ -2096,10 +2140,12 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../../assets/javascripts/workers/search.22074ed6.min.js"}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.1514a9a0.min.js"></script>
+      
+        <script src="../../../assets/versions.js"></script>
       
     
   </body>
