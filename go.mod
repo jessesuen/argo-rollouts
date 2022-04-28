@@ -3,6 +3,7 @@ module github.com/argoproj/argo-rollouts
 go 1.16
 
 require (
+	cloud.google.com/go v0.58.0 // indirect
 	github.com/antonmedv/expr v1.8.9
 	github.com/argoproj/notifications-engine v0.3.0
 	github.com/argoproj/pkg v0.9.0
@@ -17,10 +18,13 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/juju/ansiterm v0.0.0-20180109212912-720a0952cc2a
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
-	github.com/mitchellh/mapstructure v1.3.3
-	github.com/newrelic/newrelic-client-go v0.49.0
+	github.com/mattn/go-colorable v0.1.8 // indirect
+	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/reflectwalk v1.0.1 // indirect
+	github.com/newrelic/newrelic-client-go v0.77.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/client_model v0.2.0
@@ -29,6 +33,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/soheilhy/cmux v0.1.5
 	github.com/spaceapegames/go-wavefront v1.8.1
+	github.com/spf13/afero v1.4.1 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
 	github.com/tj/assert v0.0.3
