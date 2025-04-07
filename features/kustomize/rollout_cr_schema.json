@@ -105,6 +105,17 @@
                                         ],
                                         "x-kubernetes-int-or-string": true
                                     },
+                                    "consecutiveSuccessLimit": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ],
+                                        "x-kubernetes-int-or-string": true
+                                    },
                                     "count": {
                                         "anyOf": [
                                             {
@@ -244,7 +255,6 @@
                                             "datadog": {
                                                 "properties": {
                                                     "aggregator": {
-                                                        "default": "last",
                                                         "enum": [
                                                             "avg",
                                                             "min",
@@ -281,6 +291,17 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "secretRef": {
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "namespaced": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
                                                 "type": "object"
@@ -336,6 +357,10 @@
                                                                 "format": "int32",
                                                                 "type": "integer"
                                                             },
+                                                            "backoffLimitPerIndex": {
+                                                                "format": "int32",
+                                                                "type": "integer"
+                                                            },
                                                             "completionMode": {
                                                                 "type": "string"
                                                             },
@@ -345,6 +370,10 @@
                                                             },
                                                             "manualSelector": {
                                                                 "type": "boolean"
+                                                            },
+                                                            "maxFailedIndexes": {
+                                                                "format": "int32",
+                                                                "type": "integer"
                                                             },
                                                             "parallelism": {
                                                                 "format": "int32",
@@ -414,6 +443,9 @@
                                                                     "rules"
                                                                 ],
                                                                 "type": "object"
+                                                            },
+                                                            "podReplacementPolicy": {
+                                                                "type": "string"
                                                             },
                                                             "selector": {
                                                                 "properties": {
@@ -665,6 +697,20 @@
                                                                                                                     "type": "object",
                                                                                                                     "x-kubernetes-map-type": "atomic"
                                                                                                                 },
+                                                                                                                "matchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
+                                                                                                                "mismatchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
                                                                                                                 "namespaceSelector": {
                                                                                                                     "properties": {
                                                                                                                         "matchExpressions": {
@@ -767,6 +813,20 @@
                                                                                                             },
                                                                                                             "type": "object",
                                                                                                             "x-kubernetes-map-type": "atomic"
+                                                                                                        },
+                                                                                                        "matchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                                        },
+                                                                                                        "mismatchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
                                                                                                         },
                                                                                                         "namespaceSelector": {
                                                                                                             "properties": {
@@ -867,6 +927,20 @@
                                                                                                                     "type": "object",
                                                                                                                     "x-kubernetes-map-type": "atomic"
                                                                                                                 },
+                                                                                                                "matchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
+                                                                                                                "mismatchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
                                                                                                                 "namespaceSelector": {
                                                                                                                     "properties": {
                                                                                                                         "matchExpressions": {
@@ -969,6 +1043,20 @@
                                                                                                             },
                                                                                                             "type": "object",
                                                                                                             "x-kubernetes-map-type": "atomic"
+                                                                                                        },
+                                                                                                        "matchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                                        },
+                                                                                                        "mismatchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
                                                                                                         },
                                                                                                         "namespaceSelector": {
                                                                                                             "properties": {
@@ -1249,6 +1337,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -1330,6 +1430,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -1644,6 +1756,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -1672,6 +1803,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -2217,6 +2351,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -2298,6 +2444,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -2612,6 +2770,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -2640,6 +2817,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -3195,6 +3375,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -3276,6 +3468,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -3590,6 +3794,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -3618,6 +3841,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -4402,6 +4628,10 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "timeout": {
+                                                        "format": "int64",
+                                                        "type": "integer"
                                                     }
                                                 },
                                                 "required": [
@@ -4480,6 +4710,20 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "rangeQuery": {
+                                                        "properties": {
+                                                            "end": {
+                                                                "type": "string"
+                                                            },
+                                                            "start": {
+                                                                "type": "string"
+                                                            },
+                                                            "step": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     },
                                                     "timeout": {
                                                         "format": "int64",
@@ -4738,6 +4982,17 @@
                                         ],
                                         "x-kubernetes-int-or-string": true
                                     },
+                                    "consecutiveSuccessLimit": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ],
+                                        "x-kubernetes-int-or-string": true
+                                    },
                                     "count": {
                                         "anyOf": [
                                             {
@@ -4877,7 +5132,6 @@
                                             "datadog": {
                                                 "properties": {
                                                     "aggregator": {
-                                                        "default": "last",
                                                         "enum": [
                                                             "avg",
                                                             "min",
@@ -4914,6 +5168,17 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "secretRef": {
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "namespaced": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
                                                 "type": "object"
@@ -4969,6 +5234,10 @@
                                                                 "format": "int32",
                                                                 "type": "integer"
                                                             },
+                                                            "backoffLimitPerIndex": {
+                                                                "format": "int32",
+                                                                "type": "integer"
+                                                            },
                                                             "completionMode": {
                                                                 "type": "string"
                                                             },
@@ -4978,6 +5247,10 @@
                                                             },
                                                             "manualSelector": {
                                                                 "type": "boolean"
+                                                            },
+                                                            "maxFailedIndexes": {
+                                                                "format": "int32",
+                                                                "type": "integer"
                                                             },
                                                             "parallelism": {
                                                                 "format": "int32",
@@ -5047,6 +5320,9 @@
                                                                     "rules"
                                                                 ],
                                                                 "type": "object"
+                                                            },
+                                                            "podReplacementPolicy": {
+                                                                "type": "string"
                                                             },
                                                             "selector": {
                                                                 "properties": {
@@ -5298,6 +5574,20 @@
                                                                                                                     "type": "object",
                                                                                                                     "x-kubernetes-map-type": "atomic"
                                                                                                                 },
+                                                                                                                "matchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
+                                                                                                                "mismatchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
                                                                                                                 "namespaceSelector": {
                                                                                                                     "properties": {
                                                                                                                         "matchExpressions": {
@@ -5400,6 +5690,20 @@
                                                                                                             },
                                                                                                             "type": "object",
                                                                                                             "x-kubernetes-map-type": "atomic"
+                                                                                                        },
+                                                                                                        "matchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                                        },
+                                                                                                        "mismatchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
                                                                                                         },
                                                                                                         "namespaceSelector": {
                                                                                                             "properties": {
@@ -5500,6 +5804,20 @@
                                                                                                                     "type": "object",
                                                                                                                     "x-kubernetes-map-type": "atomic"
                                                                                                                 },
+                                                                                                                "matchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
+                                                                                                                "mismatchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
                                                                                                                 "namespaceSelector": {
                                                                                                                     "properties": {
                                                                                                                         "matchExpressions": {
@@ -5602,6 +5920,20 @@
                                                                                                             },
                                                                                                             "type": "object",
                                                                                                             "x-kubernetes-map-type": "atomic"
+                                                                                                        },
+                                                                                                        "matchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                                        },
+                                                                                                        "mismatchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
                                                                                                         },
                                                                                                         "namespaceSelector": {
                                                                                                             "properties": {
@@ -5882,6 +6214,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -5963,6 +6307,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -6277,6 +6633,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -6305,6 +6680,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -6850,6 +7228,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -6931,6 +7321,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -7245,6 +7647,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -7273,6 +7694,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -7828,6 +8252,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -7909,6 +8345,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -8223,6 +8671,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -8251,6 +8718,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -9035,6 +9505,10 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "timeout": {
+                                                        "format": "int64",
+                                                        "type": "integer"
                                                     }
                                                 },
                                                 "required": [
@@ -9113,6 +9587,20 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "rangeQuery": {
+                                                        "properties": {
+                                                            "end": {
+                                                                "type": "string"
+                                                            },
+                                                            "start": {
+                                                                "type": "string"
+                                                            },
+                                                            "step": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     },
                                                     "timeout": {
                                                         "format": "int64",
@@ -9384,6 +9872,17 @@
                                         ],
                                         "x-kubernetes-int-or-string": true
                                     },
+                                    "consecutiveSuccessLimit": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "string"
+                                            }
+                                        ],
+                                        "x-kubernetes-int-or-string": true
+                                    },
                                     "count": {
                                         "anyOf": [
                                             {
@@ -9523,7 +10022,6 @@
                                             "datadog": {
                                                 "properties": {
                                                     "aggregator": {
-                                                        "default": "last",
                                                         "enum": [
                                                             "avg",
                                                             "min",
@@ -9560,6 +10058,17 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "secretRef": {
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "namespaced": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
                                                 "type": "object"
@@ -9615,6 +10124,10 @@
                                                                 "format": "int32",
                                                                 "type": "integer"
                                                             },
+                                                            "backoffLimitPerIndex": {
+                                                                "format": "int32",
+                                                                "type": "integer"
+                                                            },
                                                             "completionMode": {
                                                                 "type": "string"
                                                             },
@@ -9624,6 +10137,10 @@
                                                             },
                                                             "manualSelector": {
                                                                 "type": "boolean"
+                                                            },
+                                                            "maxFailedIndexes": {
+                                                                "format": "int32",
+                                                                "type": "integer"
                                                             },
                                                             "parallelism": {
                                                                 "format": "int32",
@@ -9693,6 +10210,9 @@
                                                                     "rules"
                                                                 ],
                                                                 "type": "object"
+                                                            },
+                                                            "podReplacementPolicy": {
+                                                                "type": "string"
                                                             },
                                                             "selector": {
                                                                 "properties": {
@@ -9944,6 +10464,20 @@
                                                                                                                     "type": "object",
                                                                                                                     "x-kubernetes-map-type": "atomic"
                                                                                                                 },
+                                                                                                                "matchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
+                                                                                                                "mismatchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
                                                                                                                 "namespaceSelector": {
                                                                                                                     "properties": {
                                                                                                                         "matchExpressions": {
@@ -10046,6 +10580,20 @@
                                                                                                             },
                                                                                                             "type": "object",
                                                                                                             "x-kubernetes-map-type": "atomic"
+                                                                                                        },
+                                                                                                        "matchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                                        },
+                                                                                                        "mismatchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
                                                                                                         },
                                                                                                         "namespaceSelector": {
                                                                                                             "properties": {
@@ -10146,6 +10694,20 @@
                                                                                                                     "type": "object",
                                                                                                                     "x-kubernetes-map-type": "atomic"
                                                                                                                 },
+                                                                                                                "matchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
+                                                                                                                "mismatchLabelKeys": {
+                                                                                                                    "items": {
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": "array",
+                                                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                                                },
                                                                                                                 "namespaceSelector": {
                                                                                                                     "properties": {
                                                                                                                         "matchExpressions": {
@@ -10248,6 +10810,20 @@
                                                                                                             },
                                                                                                             "type": "object",
                                                                                                             "x-kubernetes-map-type": "atomic"
+                                                                                                        },
+                                                                                                        "matchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                                        },
+                                                                                                        "mismatchLabelKeys": {
+                                                                                                            "items": {
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": "array",
+                                                                                                            "x-kubernetes-list-type": "atomic"
                                                                                                         },
                                                                                                         "namespaceSelector": {
                                                                                                             "properties": {
@@ -10528,6 +11104,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -10609,6 +11197,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -10923,6 +11523,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -10951,6 +11570,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -11496,6 +12118,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -11577,6 +12211,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -11891,6 +12537,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -11919,6 +12584,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -12474,6 +13142,18 @@
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
                                                                                                         "tcpSocket": {
                                                                                                             "properties": {
                                                                                                                 "host": {
@@ -12555,6 +13235,18 @@
                                                                                                             },
                                                                                                             "required": [
                                                                                                                 "port"
+                                                                                                            ],
+                                                                                                            "type": "object"
+                                                                                                        },
+                                                                                                        "sleep": {
+                                                                                                            "properties": {
+                                                                                                                "seconds": {
+                                                                                                                    "format": "int64",
+                                                                                                                    "type": "integer"
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "required": [
+                                                                                                                "seconds"
                                                                                                             ],
                                                                                                             "type": "object"
                                                                                                         },
@@ -12869,6 +13561,25 @@
                                                                                             },
                                                                                             "type": "object"
                                                                                         },
+                                                                                        "resizePolicy": {
+                                                                                            "items": {
+                                                                                                "properties": {
+                                                                                                    "resourceName": {
+                                                                                                        "type": "string"
+                                                                                                    },
+                                                                                                    "restartPolicy": {
+                                                                                                        "type": "string"
+                                                                                                    }
+                                                                                                },
+                                                                                                "required": [
+                                                                                                    "resourceName",
+                                                                                                    "restartPolicy"
+                                                                                                ],
+                                                                                                "type": "object"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "resources": {
                                                                                             "properties": {
                                                                                                 "claims": {
@@ -12897,6 +13608,9 @@
                                                                                                 }
                                                                                             },
                                                                                             "type": "object"
+                                                                                        },
+                                                                                        "restartPolicy": {
+                                                                                            "type": "string"
                                                                                         },
                                                                                         "securityContext": {
                                                                                             "properties": {
@@ -13681,6 +14395,10 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "timeout": {
+                                                        "format": "int64",
+                                                        "type": "integer"
                                                     }
                                                 },
                                                 "required": [
@@ -13759,6 +14477,20 @@
                                                     },
                                                     "query": {
                                                         "type": "string"
+                                                    },
+                                                    "rangeQuery": {
+                                                        "properties": {
+                                                            "end": {
+                                                                "type": "string"
+                                                            },
+                                                            "start": {
+                                                                "type": "string"
+                                                            },
+                                                            "step": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     },
                                                     "timeout": {
                                                         "format": "int64",
@@ -14309,6 +15041,20 @@
                                                                                             "type": "object",
                                                                                             "x-kubernetes-map-type": "atomic"
                                                                                         },
+                                                                                        "matchLabelKeys": {
+                                                                                            "items": {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
+                                                                                        "mismatchLabelKeys": {
+                                                                                            "items": {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "namespaceSelector": {
                                                                                             "properties": {
                                                                                                 "matchExpressions": {
@@ -14411,6 +15157,20 @@
                                                                                     },
                                                                                     "type": "object",
                                                                                     "x-kubernetes-map-type": "atomic"
+                                                                                },
+                                                                                "matchLabelKeys": {
+                                                                                    "items": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "type": "array",
+                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                },
+                                                                                "mismatchLabelKeys": {
+                                                                                    "items": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "type": "array",
+                                                                                    "x-kubernetes-list-type": "atomic"
                                                                                 },
                                                                                 "namespaceSelector": {
                                                                                     "properties": {
@@ -14511,6 +15271,20 @@
                                                                                             "type": "object",
                                                                                             "x-kubernetes-map-type": "atomic"
                                                                                         },
+                                                                                        "matchLabelKeys": {
+                                                                                            "items": {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
+                                                                                        "mismatchLabelKeys": {
+                                                                                            "items": {
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "type": "array",
+                                                                                            "x-kubernetes-list-type": "atomic"
+                                                                                        },
                                                                                         "namespaceSelector": {
                                                                                             "properties": {
                                                                                                 "matchExpressions": {
@@ -14613,6 +15387,20 @@
                                                                                     },
                                                                                     "type": "object",
                                                                                     "x-kubernetes-map-type": "atomic"
+                                                                                },
+                                                                                "matchLabelKeys": {
+                                                                                    "items": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "type": "array",
+                                                                                    "x-kubernetes-list-type": "atomic"
+                                                                                },
+                                                                                "mismatchLabelKeys": {
+                                                                                    "items": {
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "type": "array",
+                                                                                    "x-kubernetes-list-type": "atomic"
                                                                                 },
                                                                                 "namespaceSelector": {
                                                                                     "properties": {
@@ -14893,6 +15681,18 @@
                                                                                     ],
                                                                                     "type": "object"
                                                                                 },
+                                                                                "sleep": {
+                                                                                    "properties": {
+                                                                                        "seconds": {
+                                                                                            "format": "int64",
+                                                                                            "type": "integer"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "seconds"
+                                                                                    ],
+                                                                                    "type": "object"
+                                                                                },
                                                                                 "tcpSocket": {
                                                                                     "properties": {
                                                                                         "host": {
@@ -14974,6 +15774,18 @@
                                                                                     },
                                                                                     "required": [
                                                                                         "port"
+                                                                                    ],
+                                                                                    "type": "object"
+                                                                                },
+                                                                                "sleep": {
+                                                                                    "properties": {
+                                                                                        "seconds": {
+                                                                                            "format": "int64",
+                                                                                            "type": "integer"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "seconds"
                                                                                     ],
                                                                                     "type": "object"
                                                                                 },
@@ -15288,6 +16100,25 @@
                                                                     },
                                                                     "type": "object"
                                                                 },
+                                                                "resizePolicy": {
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "resourceName": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "restartPolicy": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "resourceName",
+                                                                            "restartPolicy"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "type": "array",
+                                                                    "x-kubernetes-list-type": "atomic"
+                                                                },
                                                                 "resources": {
                                                                     "properties": {
                                                                         "claims": {
@@ -15316,6 +16147,9 @@
                                                                         }
                                                                     },
                                                                     "type": "object"
+                                                                },
+                                                                "restartPolicy": {
+                                                                    "type": "string"
                                                                 },
                                                                 "securityContext": {
                                                                     "properties": {
@@ -15861,6 +16695,18 @@
                                                                                     ],
                                                                                     "type": "object"
                                                                                 },
+                                                                                "sleep": {
+                                                                                    "properties": {
+                                                                                        "seconds": {
+                                                                                            "format": "int64",
+                                                                                            "type": "integer"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "seconds"
+                                                                                    ],
+                                                                                    "type": "object"
+                                                                                },
                                                                                 "tcpSocket": {
                                                                                     "properties": {
                                                                                         "host": {
@@ -15942,6 +16788,18 @@
                                                                                     },
                                                                                     "required": [
                                                                                         "port"
+                                                                                    ],
+                                                                                    "type": "object"
+                                                                                },
+                                                                                "sleep": {
+                                                                                    "properties": {
+                                                                                        "seconds": {
+                                                                                            "format": "int64",
+                                                                                            "type": "integer"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "seconds"
                                                                                     ],
                                                                                     "type": "object"
                                                                                 },
@@ -16256,6 +17114,25 @@
                                                                     },
                                                                     "type": "object"
                                                                 },
+                                                                "resizePolicy": {
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "resourceName": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "restartPolicy": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "resourceName",
+                                                                            "restartPolicy"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "type": "array",
+                                                                    "x-kubernetes-list-type": "atomic"
+                                                                },
                                                                 "resources": {
                                                                     "properties": {
                                                                         "claims": {
@@ -16284,6 +17161,9 @@
                                                                         }
                                                                     },
                                                                     "type": "object"
+                                                                },
+                                                                "restartPolicy": {
+                                                                    "type": "string"
                                                                 },
                                                                 "securityContext": {
                                                                     "properties": {
@@ -16839,6 +17719,18 @@
                                                                                     ],
                                                                                     "type": "object"
                                                                                 },
+                                                                                "sleep": {
+                                                                                    "properties": {
+                                                                                        "seconds": {
+                                                                                            "format": "int64",
+                                                                                            "type": "integer"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "seconds"
+                                                                                    ],
+                                                                                    "type": "object"
+                                                                                },
                                                                                 "tcpSocket": {
                                                                                     "properties": {
                                                                                         "host": {
@@ -16920,6 +17812,18 @@
                                                                                     },
                                                                                     "required": [
                                                                                         "port"
+                                                                                    ],
+                                                                                    "type": "object"
+                                                                                },
+                                                                                "sleep": {
+                                                                                    "properties": {
+                                                                                        "seconds": {
+                                                                                            "format": "int64",
+                                                                                            "type": "integer"
+                                                                                        }
+                                                                                    },
+                                                                                    "required": [
+                                                                                        "seconds"
                                                                                     ],
                                                                                     "type": "object"
                                                                                 },
@@ -17234,6 +18138,25 @@
                                                                     },
                                                                     "type": "object"
                                                                 },
+                                                                "resizePolicy": {
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "resourceName": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "restartPolicy": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "resourceName",
+                                                                            "restartPolicy"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "type": "array",
+                                                                    "x-kubernetes-list-type": "atomic"
+                                                                },
                                                                 "resources": {
                                                                     "properties": {
                                                                         "claims": {
@@ -17262,6 +18185,9 @@
                                                                         }
                                                                     },
                                                                     "type": "object"
+                                                                },
+                                                                "restartPolicy": {
+                                                                    "type": "string"
                                                                 },
                                                                 "securityContext": {
                                                                     "properties": {
@@ -18459,6 +19385,18 @@
                                                                         ],
                                                                         "type": "object"
                                                                     },
+                                                                    "sleep": {
+                                                                        "properties": {
+                                                                            "seconds": {
+                                                                                "format": "int64",
+                                                                                "type": "integer"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "seconds"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
                                                                     "tcpSocket": {
                                                                         "properties": {
                                                                             "host": {
@@ -18540,6 +19478,18 @@
                                                                         },
                                                                         "required": [
                                                                             "port"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "sleep": {
+                                                                        "properties": {
+                                                                            "seconds": {
+                                                                                "format": "int64",
+                                                                                "type": "integer"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "seconds"
                                                                         ],
                                                                         "type": "object"
                                                                     },
@@ -18854,6 +19804,25 @@
                                                         },
                                                         "type": "object"
                                                     },
+                                                    "resizePolicy": {
+                                                        "items": {
+                                                            "properties": {
+                                                                "resourceName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "restartPolicy": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "resourceName",
+                                                                "restartPolicy"
+                                                            ],
+                                                            "type": "object"
+                                                        },
+                                                        "type": "array",
+                                                        "x-kubernetes-list-type": "atomic"
+                                                    },
                                                     "resources": {
                                                         "properties": {
                                                             "claims": {
@@ -18882,6 +19851,9 @@
                                                             }
                                                         },
                                                         "type": "object"
+                                                    },
+                                                    "restartPolicy": {
+                                                        "type": "string"
                                                     },
                                                     "securityContext": {
                                                         "properties": {
@@ -19392,6 +20364,18 @@
                                                                         ],
                                                                         "type": "object"
                                                                     },
+                                                                    "sleep": {
+                                                                        "properties": {
+                                                                            "seconds": {
+                                                                                "format": "int64",
+                                                                                "type": "integer"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "seconds"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
                                                                     "tcpSocket": {
                                                                         "properties": {
                                                                             "host": {
@@ -19473,6 +20457,18 @@
                                                                         },
                                                                         "required": [
                                                                             "port"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "sleep": {
+                                                                        "properties": {
+                                                                            "seconds": {
+                                                                                "format": "int64",
+                                                                                "type": "integer"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "seconds"
                                                                         ],
                                                                         "type": "object"
                                                                     },
@@ -19787,6 +20783,25 @@
                                                         },
                                                         "type": "object"
                                                     },
+                                                    "resizePolicy": {
+                                                        "items": {
+                                                            "properties": {
+                                                                "resourceName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "restartPolicy": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "resourceName",
+                                                                "restartPolicy"
+                                                            ],
+                                                            "type": "object"
+                                                        },
+                                                        "type": "array",
+                                                        "x-kubernetes-list-type": "atomic"
+                                                    },
                                                     "resources": {
                                                         "properties": {
                                                             "claims": {
@@ -19815,6 +20830,9 @@
                                                             }
                                                         },
                                                         "type": "object"
+                                                    },
+                                                    "restartPolicy": {
+                                                        "type": "string"
                                                     },
                                                     "securityContext": {
                                                         "properties": {
@@ -20361,6 +21379,18 @@
                                                                         ],
                                                                         "type": "object"
                                                                     },
+                                                                    "sleep": {
+                                                                        "properties": {
+                                                                            "seconds": {
+                                                                                "format": "int64",
+                                                                                "type": "integer"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "seconds"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
                                                                     "tcpSocket": {
                                                                         "properties": {
                                                                             "host": {
@@ -20442,6 +21472,18 @@
                                                                         },
                                                                         "required": [
                                                                             "port"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "sleep": {
+                                                                        "properties": {
+                                                                            "seconds": {
+                                                                                "format": "int64",
+                                                                                "type": "integer"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "seconds"
                                                                         ],
                                                                         "type": "object"
                                                                     },
@@ -20756,6 +21798,25 @@
                                                         },
                                                         "type": "object"
                                                     },
+                                                    "resizePolicy": {
+                                                        "items": {
+                                                            "properties": {
+                                                                "resourceName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "restartPolicy": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "resourceName",
+                                                                "restartPolicy"
+                                                            ],
+                                                            "type": "object"
+                                                        },
+                                                        "type": "array",
+                                                        "x-kubernetes-list-type": "atomic"
+                                                    },
                                                     "resources": {
                                                         "properties": {
                                                             "claims": {
@@ -20784,6 +21845,9 @@
                                                             }
                                                         },
                                                         "type": "object"
+                                                    },
+                                                    "restartPolicy": {
+                                                        "type": "string"
                                                     },
                                                     "securityContext": {
                                                         "properties": {
